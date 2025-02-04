@@ -46,6 +46,18 @@ const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/all-users" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
+              <Home />
+              {isExpanded && <span>All Users</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
+              <Home />
+              {isExpanded && <span>Dashboard</span>}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/home" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
               <Info />
               {isExpanded && <span>Home</span>}
