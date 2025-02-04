@@ -24,6 +24,17 @@ export const signinUser = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  "user/profile/update",
+  async (data, thunkAPI) => {
+    try {
+      return await authService.updateUser(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const getCustomerfromLocalStorage = localStorage.getItem("customer")
   ? JSON.parse(localStorage.getItem("customer"))
   : null;
@@ -85,7 +96,40 @@ const authSlice = createSlice({
         if (state.isError) {
           toast.error(action.payload?.response?.data?.message || "Login failed");
         }
-      });
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.updatedUser = action.payload;
+
+        if (state.isSuccess === true) {
+          let currentUserData = JSON.parse(localStorage.getItem("customer"));
+          let newUserData = {
+            _id: currentUserData?._id,
+            token: currentUserData.token,
+            firstname: action?.payload?.firstname,
+            lastname: action?.payload?.lastname,
+            email: action?.payload?.email,
+            mobile: action?.payload?.mobile,
+          };
+          localStorage.setItem("customer", JSON.stringify(newUserData));
+          state.user = newUserData;
+          toast.success("Profile Updated Successfully!");
+        }
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+        if (state.isError) {
+          toast.error("Something Went Wrong!");
+        }
+      })
   },
 });
 

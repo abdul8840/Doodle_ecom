@@ -1,6 +1,7 @@
 import { generateToken } from '../config/jwtToken.js';
 import { generateRefreshToken } from '../config/refreshToken.js';
 import User from '../models/userModel.js'
+import validateMongoDbId from '../utils/validateMongoDbId.js';
 
 export const Signup = async (req, res) => {
 
@@ -80,3 +81,55 @@ export const Signout = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+// const updatedUser = asyncHandler(async (req, res) => {
+//   const { _id } = req.user;
+//   validateMongoDbId(_id);
+
+//   try {
+//     const updatedUser = await User.findByIdAndUpdate(
+//       _id,
+//       {
+//         firstname: req?.body?.firstname,
+//         lastname: req?.body?.lastname,
+//         email: req?.body?.email,
+//         mobile: req?.body?.mobile,
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     res.json(updatedUser);
+//   } catch (error) {
+//     throw new Error(error);
+//   }
+// });
+
+export const UpdateUser = async (req, res) => {
+  const { _id } = req.user; // Ensure this is coming from the URL parameter
+  validateMongoDbId(_id); // Validate the MongoDB ID
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      _id, // Use the 'id' from req.params
+      {
+        firstname: req?.body?.firstname,
+        lastname: req?.body?.lastname,
+        email: req?.body?.email,
+        mobile: req?.body?.mobile,
+      },
+      {
+        new: true, // This will return the updated document
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

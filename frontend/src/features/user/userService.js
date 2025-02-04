@@ -1,5 +1,6 @@
 // userService.js
 import { base_url, config } from "../../utils/config";
+import axios from "axios";
 
 const signup = async (userData) => {
   const response = await fetch(`${base_url}/auth/signup`, {
@@ -43,8 +44,22 @@ const signin = async (userData) => {
   return data;
 };
 
+const updateUser = async (data) => {
+  const response = await axios.put(
+    `${base_url}/auth/edit-user`,
+    data.data,
+    data.config2,
+    config
+  );
+
+  if (response.data) {
+    return response.data;
+  }
+};
+
 
 export const authService = {
   signup,
   signin,
+  updateUser,
 }
