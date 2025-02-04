@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, Info, Settings, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const authState = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
@@ -49,6 +55,12 @@ const Sidebar = () => {
             <NavLink to="/settings" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
               <Settings />
               {isExpanded && <span>Settings</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink onClick={handleLogout} className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
+              <LogoutIcon />
+              {isExpanded && <span>Logout</span>}
             </NavLink>
           </li>
         </ul>
