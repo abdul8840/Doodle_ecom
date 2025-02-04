@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Container } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUser } from "../features/user/userSlice";
+import { toast } from "react-toastify";
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -15,11 +20,20 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle signup logic
-    console.log(formData);
+    
+    try {
+      const result = await dispatch(signupUser(formData)); // Unwrap to get the payload
+      
+      toast.success("User Created Successfully"); // Show success toast
+      setFormData({ firstname: "", lastname: "", email: "", mobile: "", password: "" }); // Reset form
+      navigate("/sign-in"); // Redirect after success
+    } catch (error) {
+      toast.error(error?.message || "Signup failed"); // Show error message
+    }
   };
+  
 
   return (
     <Container maxWidth="sm" className="mt-10">

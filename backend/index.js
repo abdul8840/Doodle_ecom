@@ -14,10 +14,12 @@ dbConnect();
 app.use(express.json());
 app.use(cookieParser());
 
-cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-})
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    credentials: true, // Allow cookies and credentials
+  })
+);
 
 app.use('/api/auth', authRoutes)
 
