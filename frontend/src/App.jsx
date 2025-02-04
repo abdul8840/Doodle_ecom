@@ -1,16 +1,19 @@
 import { Button } from '@mui/material'
 import React from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Signup from './pages/Signup';
+import Home from './pages/Home';
+import Signin from './pages/Signin';
 
 const App = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-      <Button variant="contained" color="primary">
-        Click Me
-      </Button>
-    </div>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/sign-up" element={<Signup />} />
+      <Route path="/sign-in" element={<Signin />} />
+    </Routes>
+    </BrowserRouter>
   )
 }
 
