@@ -59,6 +59,41 @@ export const Signin = async (req, res) => {
   }
 }
 
+export const adminSignin = async (req,res) => {
+  try {
+    const { email, password} = req.body;
+    const findAdmin = await User.findOne({ email });
+    if (findAdmin.role !== 'admin') return res.status(400).json({ message: "Not Authorized" });
+    if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
+      const refreshToken = await generateRefreshToken(findAdmin?._id);
+      const updateuser = await User.findByIdAndUpdate(
+        findAdmin.id,
+        {
+          refreshToken: refreshToken,
+        },
+        { new: true }
+      );
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 72 * 60 * 60 * 1000,
+      });
+      res.json({
+        _id: findAdmin?._id,
+        firstname: findAdmin?.firstname,
+        lastname: findAdmin?.lastname,
+        email: findAdmin?.email,
+        mobile: findAdmin?.mobile,
+        token: generateToken(findAdmin?._id),
+      });
+    } else {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 export const Signout = async (req, res) => {
   try {
     
@@ -81,29 +116,6 @@ export const Signout = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
-
-// const updatedUser = asyncHandler(async (req, res) => {
-//   const { _id } = req.user;
-//   validateMongoDbId(_id);
-
-//   try {
-//     const updatedUser = await User.findByIdAndUpdate(
-//       _id,
-//       {
-//         firstname: req?.body?.firstname,
-//         lastname: req?.body?.lastname,
-//         email: req?.body?.email,
-//         mobile: req?.body?.mobile,
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     res.json(updatedUser);
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
 
 export const UpdateUser = async (req, res) => {
   const { _id } = req.user; // Ensure this is coming from the URL parameter

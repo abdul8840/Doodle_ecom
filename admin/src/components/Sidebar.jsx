@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, Info, Settings, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
+
+  const authState = useSelector((state) => state.auth);
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
@@ -14,11 +17,19 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div className={`h-screen bg-gray-900 text-white p-4 transition-all duration-300 ${isExpanded ? "w-64" : "w-16"}`}>
         {/* Sidebar Toggle Button */}
-        <div className="flex justify-end">
-          <button onClick={toggleSidebar} className="text-white">
-            {isExpanded ? <ChevronLeft /> : <ChevronRight />}
-          </button>
+
+        <div className="flex justify-between border-b pb-2">
+          {isExpanded && <div className="">
+            <p className="text-sm">Welcome Admin,</p>
+            <h2 className="text-lg">{authState.user.firstname} {authState.user.lastname} </h2>
+          </div>}
+          <div className="flex justify-end">
+            <button onClick={toggleSidebar} className="text-white">
+              {isExpanded ? <ChevronLeft /> : <ChevronRight />}
+            </button>
+          </div>
         </div>
+
 
         {/* Sidebar Menu */}
         <ul className="mt-4 space-y-4">

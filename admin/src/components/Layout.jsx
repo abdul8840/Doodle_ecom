@@ -1,3 +1,4 @@
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
@@ -5,9 +6,8 @@ const Layout = () => {
   return (
     <div className="flex">
       <Sidebar />
-      {/* Main Content Area */}
-      <div className="flex-1 p-4">
-        <Outlet />
+      <div className="flex-1 p-5">
+        <Outlet /> {/* This is where nested pages will render */}
       </div>
     </div>
   );
