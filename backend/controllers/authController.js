@@ -57,3 +57,26 @@ export const Signin = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export const Signout = async (req, res) => {
+  try {
+    
+    const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) return res.status(400).json({ message: "No Refresh Token" });
+
+  const user = await User.findOne({ refreshToken });
+  if (!user) {
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+    return res.sendStatus(204);
+  }
+
+  await User.findOneAndUpdate({ refreshToken }, { refreshToken: "" });
+
+  res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+  res.sendStatus(204).json({ message: "Signout Successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
