@@ -53,6 +53,12 @@ const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/product-category" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
+              <PeopleAltIcon />
+              {isExpanded && <span>Product Category</span>}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/home" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
               <Info />
               {isExpanded && <span>Home</span>}
