@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import brandRoutes from './routes/brandRoutes.js';
 import { dbConnect } from './config/db.js';
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(
 
 app.use('/api/auth', authRoutes)
 app.use('/api/category', categoryRoutes)
+app.use('/api/brand', brandRoutes)
 
 app.get('/', (req, res) => {
   res.send('Alhamdulillah! Api is working')

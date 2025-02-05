@@ -10,6 +10,8 @@ import GetAllUsers from "./pages/GetAllUsers";
 import ProductCategoryList from "./pages/ProductCategoryList";
 import ProductCategoryCreate from "./pages/ProductCategoryCreate";
 import UpdateProductCategory from "./pages/UpdateProductCategory";
+import Addbrand from "./pages/AddBrand";
+import BrandList from "./pages/BrandList";
 
 const App = () => {
   return (
@@ -26,6 +28,9 @@ const App = () => {
             <Route path="product-category" element={<ProductCategoryList />} />
             <Route path="create-product-category" element={<ProductCategoryCreate />} />
             <Route path="update-product-category/:id" element={<UpdateProductCategory />} />
+            <Route path="create-brand" element={<Addbrand />} />
+            <Route path="create-brand/:id" element={<Addbrand />} />
+            <Route path="get-brand" element={<BrandList />} />
             <Route path="home" element={<Home />} />
             <Route path="settings" element={<Setting />} />
           </Route>
