@@ -28,7 +28,7 @@ const updateProductCategory = async (category) => {
   console.log(category);
   const response = await axios.put(
     `${base_url}category/update-category/${category.id}`,
-    { title: category.pCatData.title },
+    { name: category.pCatData.name, desc: category.pCatData.desc },
     config
   );
 

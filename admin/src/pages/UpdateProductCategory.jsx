@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { getAProductCategory, updateAProductCategory, resetState } from "../features/pcategory/categorySlice";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, CircularProgress } from "@mui/material";
 
 let schema = yup.object().shape({
   name: yup.string().required("Category Name is Required"),
@@ -53,13 +53,14 @@ const UpdateProductCategory = () => {
     },
   });
 
-
   return (
     <div className="max-w-4xl mx-auto p-5">
       <h3 className="text-2xl font-semibold mb-5">Update Category</h3>
 
       {isLoading ? (
-        <div>Loading...</div> // Show loading spinner while fetching category data
+        <div className="flex justify-center">
+          <CircularProgress /> {/* Show loading spinner while fetching category data */}
+        </div>
       ) : (
         <form onSubmit={formik.handleSubmit} className="space-y-4">
           <div>

@@ -48,7 +48,7 @@ const Addbrand = () => {
     }
     if (isSuccess && updatedBrand) {
       toast.success("Brand Updated Successfully!");
-      navigate("/admin/list-brand");
+      navigate("/create-brand");
     }
     if (isError) {
       toast.error("Something Went Wrong!");

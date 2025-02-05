@@ -9,6 +9,7 @@ import { AiFillDelete } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
+
 const ProductCategoryList = () => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -58,7 +59,7 @@ const ProductCategoryList = () => {
       headerName: "Action",
       width: 150,
       renderCell: (params) => (
-        <div>
+        <div className="flex mt-4">
           <Link to={`/update-product-category/${params.row.id}`} className="text-blue-500">
             <BiEdit size={20} />
           </Link>
