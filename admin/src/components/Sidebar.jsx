@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, Info, Settings, ChevronLeft, ChevronRight } from "@mui/icons-material";
 import LogoutIcon from '@mui/icons-material/Logout';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import { useSelector } from "react-redux";
 
 const Sidebar = () => {
@@ -47,14 +48,8 @@ const Sidebar = () => {
           </li>
           <li>
             <NavLink to="/all-users" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
-              <Home />
+              <PeopleAltIcon />
               {isExpanded && <span>All Users</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/" className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded">
-              <Home />
-              {isExpanded && <span>Dashboard</span>}
             </NavLink>
           </li>
           <li>

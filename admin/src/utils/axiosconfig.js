@@ -10,3 +10,14 @@ export const config = {
     Accept: "application/json",
   },
 };
+
+export const getConfig = () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  return {
+    headers: {
+      Authorization: user?.token ? `Bearer ${user.token}` : "",
+      Accept: "application/json",
+    },
+  };
+};

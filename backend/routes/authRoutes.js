@@ -1,6 +1,6 @@
 import express from 'express'
-import { adminSignin, Signin, Signout, Signup, UpdateUser, getallUser } from '../controllers/authController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { adminSignin, Signin, Signout, Signup, UpdateUser, getallUser, deleteUser, makeAdmin } from '../controllers/authController.js';
+import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -10,6 +10,8 @@ router.post('/admin-signin', adminSignin);
 router.get('/signout', Signout);
 router.put("/edit-user", authMiddleware, UpdateUser);
 
-router.get("/all-users", getallUser);
+router.get("/all-users",authMiddleware, isAdmin, getallUser);
+router.delete("/delete-user/:id",authMiddleware, isAdmin, deleteUser);
+router.put("/make-admin/:id",authMiddleware, isAdmin, makeAdmin);
 
 export default router;

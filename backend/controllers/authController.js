@@ -155,3 +155,36 @@ export const getallUser = async (req,res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export const deleteUser = async (req, res) => {
+  const { id } = req.params; // Use req.params.id instead of req.user._id
+  validateMongoDbId(id);
+  try {
+    await User.findByIdAndDelete(id);
+    res.status(200).json('User has been deleted');
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const makeAdmin = async (req, res) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { role: "admin" },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
