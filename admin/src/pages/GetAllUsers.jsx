@@ -63,6 +63,51 @@ const GetAllUsers = () => {
     handleCloseDialog();
   };
 
+  const handlePrint = () => {
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Doodle Ecom</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #4CAF50; color: white; } /* Highlight header */
+          </style>
+        </head>
+        <body>
+          <h2>Customer List</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>SNo</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredData
+        .map(
+          (user) => `
+                    <tr>
+                      <td>${user.id}</td>
+                      <td>${user.name}</td>
+                      <td>${user.email}</td>
+                      <td>${user.mobile}</td>
+                    </tr>`
+        )
+        .join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   const columns = [
     { field: "sno", headerName: "SNo", width: 90 },
     { field: "name", headerName: "Name", width: 200, sortable: true },
@@ -108,10 +153,10 @@ const GetAllUsers = () => {
             Export CSV
           </Button>
         </CSVLink>
-        <Button variant="contained" color="secondary">Print</Button>
+        <Button variant="contained" color="secondary" onClick={handlePrint}>Print</Button>
       </div>
 
-      <div className="mt-4" style={{ height: 400, width: "100%" }}>
+      <div className="mt-4 customers-table" style={{ height: 400, width: "100%" }}>
         <DataGrid
           rows={filteredData}
           columns={columns}
