@@ -12,6 +12,8 @@ import ProductCategoryCreate from "./pages/ProductCategoryCreate";
 import UpdateProductCategory from "./pages/UpdateProductCategory";
 import Addbrand from "./pages/AddBrand";
 import BrandList from "./pages/BrandList";
+import ColorList from "./pages/ColorList";
+import AddColor from "./pages/AddColor";
 
 const App = () => {
   return (
@@ -31,6 +33,9 @@ const App = () => {
             <Route path="create-brand" element={<Addbrand />} />
             <Route path="create-brand/:id" element={<Addbrand />} />
             <Route path="get-brand" element={<BrandList />} />
+            <Route path="color" element={<ColorList />} />
+            <Route path="create-color" element={<AddColor />} />
+            <Route path="create-color/:id" element={<AddColor />} />
             <Route path="home" element={<Home />} />
             <Route path="settings" element={<Setting />} />
           </Route>

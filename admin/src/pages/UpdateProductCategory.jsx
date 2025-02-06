@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -14,18 +14,17 @@ let schema = yup.object().shape({
 
 const UpdateProductCategory = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const categoryId = location.pathname.split("/")[3]; // Extract category ID from URL
+  const { id } = useParams(); // Extract category ID from URL
   const navigate = useNavigate(); // Initialize navigate
 
   const { categoryName, categoryDesc, isSuccess, isError, updatedCategory, isLoading } = useSelector((state) => state.pCategory);
 
   // Fetch category data on initial load
   useEffect(() => {
-    if (categoryId) {
-      dispatch(getAProductCategory(categoryId)); // Fetch category data for editing
+    if (id) {
+      dispatch(getAProductCategory(id)); // Fetch category data for editing
     }
-  }, [categoryId, dispatch]);
+  }, [id, dispatch]);
 
   // Handle success or error after category data is fetched or updated
   useEffect(() => {
@@ -48,7 +47,7 @@ const UpdateProductCategory = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      const data = { id: categoryId, pCatData: values };
+      const data = { id, pCatData: values };
       dispatch(updateAProductCategory(data)); // Dispatch update action
     },
   });

@@ -1,4 +1,5 @@
 import Brand from "../models/brandModel.js";
+import validateMongoDbId from "../utils/validateMongoDbId.js";
 
 export const createBrand = async (req, res) => {
   try {

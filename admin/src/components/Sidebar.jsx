@@ -65,6 +65,12 @@ const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/color" className="flex items-center space-x-4 p-2 hover:bg-gray-100 rounded">
+              <PeopleAltIcon />
+              {isExpanded && <span>Color List</span>}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/home" className="flex items-center space-x-4 p-2 hover:bg-gray-100 rounded">
               <Info />
               {isExpanded && <span>Home</span>}

@@ -65,6 +65,7 @@ const BrandList = () => {
             <TableRow>
               <TableCell>SNo</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -73,6 +74,7 @@ const BrandList = () => {
               <TableRow key={brand._id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{brand.title}</TableCell>
+                <TableCell>{brand.description}</TableCell>
                 <TableCell>
                   <IconButton component={Link} to={`/create-brand/${brand._id}`} color="primary">
                     <BiEdit />

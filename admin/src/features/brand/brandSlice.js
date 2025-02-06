@@ -105,7 +105,8 @@ export const brandSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.brandName = action.payload;
+        state.brandName = action.payload.title;
+        state.brandDescription = action.payload.description;
       })
       .addCase(getABrand.rejected, (state, action) => {
         state.isLoading = false;
