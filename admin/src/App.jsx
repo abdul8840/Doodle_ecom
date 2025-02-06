@@ -14,6 +14,8 @@ import Addbrand from "./pages/AddBrand";
 import BrandList from "./pages/BrandList";
 import ColorList from "./pages/ColorList";
 import AddColor from "./pages/AddColor";
+import ProductList from "./pages/ProductList";
+import AddProduct from "./pages/AddProduct";
 
 const App = () => {
   return (
@@ -36,6 +38,9 @@ const App = () => {
             <Route path="color" element={<ColorList />} />
             <Route path="create-color" element={<AddColor />} />
             <Route path="create-color/:id" element={<AddColor />} />
+            <Route path="product" element={<ProductList />} />
+            <Route path="create-product" element={<AddProduct />} />
+            <Route path="create-product/:id" element={<AddProduct />} />
             <Route path="home" element={<Home />} />
             <Route path="settings" element={<Setting />} />
           </Route>

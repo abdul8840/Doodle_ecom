@@ -169,11 +169,11 @@ export const deleteUser = async (req, res) => {
 };
 
 export const makeAdmin = async (req, res) => {
-  const { _id } = req.user;
-  validateMongoDbId(_id);
+  const { id } = req.user;
+  validateMongoDbId(id);
   try {
     const updatedUser = await User.findByIdAndUpdate(
-      _id,
+      id,
       { role: "admin" },
       { new: true }
     );

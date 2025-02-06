@@ -7,7 +7,12 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import brandRoutes from './routes/brandRoutes.js';
 import colorRoutes from './routes/colorRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import { dbConnect } from './config/db.js';
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from "url";
+
 
 dotenv.config();
 
@@ -25,11 +30,20 @@ app.use(
   })
 );
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+fs.ensureDirSync(path.join(__dirname, 'public/images/products'));
+fs.ensureDirSync(path.join(__dirname, 'public/images/blogs'));
+
 app.use('/api/auth', authRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/brand', brandRoutes)
 app.use('/api/color', colorRoutes)
 app.use('/api/product', productRoutes)
+app.use("/api/upload", uploadRoutes);
+
+app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 
 app.get('/', (req, res) => {
   res.send('Alhamdulillah! Api is working')

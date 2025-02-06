@@ -1,7 +1,7 @@
 import express from 'express'
 import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
-import { productImgResize, uploadPhoto } from '../middlewares/uploadImage.js';
-import { uploadImages } from '../controllers/uploadController.js';
+import {  uploadPhoto } from '../middlewares/uploadImage.js';
+import { deleteImages, uploadImages } from '../controllers/uploadController.js';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post(
   authMiddleware,
   isAdmin,
   uploadPhoto.array("images", 10),
-  productImgResize,
+  // productImgResize,
   uploadImages
 );
 
