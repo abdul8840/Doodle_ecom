@@ -12,7 +12,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -29,9 +29,12 @@ import {
   updateAProduct,
 } from "../features/product/productSlice";
 
+import JoditEditor from "jodit-react";
+import { useRef } from "react";
+
 const schema = yup.object().shape({
   title: yup.string().required("Title is Required"),
-  slug: yup.string().required("Slug is Required"),
+  // slug: yup.string().required("Slug is Required"),
   shortDescription: yup.string().required("Short Description is Required"),
   description: yup.string().required("Description is Required"),
   mrp_price: yup.number().required("MRP Price is Required"),
@@ -46,8 +49,6 @@ const schema = yup.object().shape({
 
 const AddProduct = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const getProductId = location.pathname.split("/")[3];
   const navigate = useNavigate();
   const [color, setColor] = useState([]);
   const [images, setImages] = useState([]);
@@ -56,11 +57,52 @@ const AddProduct = () => {
   const [inputSize, setInputSize] = useState("");
   const [inputTag, setInputTag] = useState("");
 
+  const { id } = useParams();
+  const editor = useRef(null);
+
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
     dispatch(getColors());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getAProduct(id)).then((action) => {
+        const productData = action.payload;
+        if (productData) {
+          formik.setValues({
+            title: productData.title,
+            // slug: productData.slug,
+            shortDescription: productData.shortDescription,
+            description: productData.description,
+            mrp_price: productData.mrp_price,
+            selling_price: productData.selling_price,
+            brand: productData.brand,
+            category: productData.category,
+            quantity: productData.quantity,
+            sizes: productData.sizes,
+            tags: productData.tags,
+            color: productData.color,
+            images: productData.images,
+            newarrivedproduct: productData.newarrivedproduct,
+            trendingproduct: productData.trendingproduct,
+            featuredproduct: productData.featuredproduct,
+          });
+          setSizes(productData.sizes);
+          setTags(productData.tags);
+          setColor(productData.color);
+          setImages(productData.images);
+        }
+      });
+    } else {
+      formik.resetForm();
+      setColor([]);
+      setSizes([]);
+      setTags([]);
+      setImages([]);
+    }
+  }, [id, dispatch]);
 
   const brandState = useSelector((state) => state.brand.brands);
   const catState = useSelector((state) => state.pCategory.pCategories);
@@ -71,7 +113,7 @@ const AddProduct = () => {
   const formik = useFormik({
     initialValues: {
       title: "",
-      slug: "",
+      // slug: "",
       shortDescription: "",
       description: "",
       mrp_price: "",
@@ -89,18 +131,24 @@ const AddProduct = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      if (getProductId !== undefined) {
-        const data = { id: getProductId, productData: values };
-        dispatch(updateAProduct(data));
+      if (id) {
+        const data = { id, productData: { ...values, images } };
+        dispatch(updateAProduct(data)).then(() => {
+          toast.success("Product Updated Successfully");
+          navigate("/product");
+        });
       } else {
-        dispatch(createProducts(values));
-        formik.resetForm();
-        setColor([]);
-        setSizes([]);
-        setTags([]);
-        setTimeout(() => {
-          dispatch(resetState());
-        }, 3000);
+        dispatch(createProducts({ ...values, images })).then(() => {
+          toast.success("Product Added Successfully");
+          formik.resetForm();
+          setColor([]);
+          setSizes([]);
+          setTags([]);
+          setImages([]);
+          setTimeout(() => {
+            dispatch(resetState());
+          }, 3000);
+        });
       }
     },
   });
@@ -127,17 +175,27 @@ const AddProduct = () => {
   };
 
   const handleImageUpload = (acceptedFiles) => {
-    dispatch(uploadImg(acceptedFiles));
+    dispatch(uploadImg(acceptedFiles)).then((action) => {
+      const uploadedImages = action.payload;
+      if (uploadedImages) {
+        setImages([...images, ...uploadedImages]);
+        formik.setFieldValue("images", [...images, ...uploadedImages]);
+      }
+    });
   };
 
   const handleImageDelete = (public_id) => {
-    dispatch(delImg(public_id));
+    dispatch(delImg(public_id)).then(() => {
+      const newImages = images.filter((image) => image.public_id !== public_id);
+      setImages(newImages);
+      formik.setFieldValue("images", newImages);
+    });
   };
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        {getProductId !== undefined ? "Edit" : "Add"} Product
+        {id ? "Edit" : "Add"} Product
       </Typography>
       <form onSubmit={formik.handleSubmit}>
         {/* Product Title */}
@@ -154,7 +212,7 @@ const AddProduct = () => {
         />
 
         {/* Slug */}
-        <TextField
+        {/* <TextField
           fullWidth
           label="Slug"
           name="slug"
@@ -164,7 +222,7 @@ const AddProduct = () => {
           error={formik.touched.slug && Boolean(formik.errors.slug)}
           helperText={formik.touched.slug && formik.errors.slug}
           margin="normal"
-        />
+        /> */}
 
         {/* Short Description */}
         <TextField
@@ -180,7 +238,7 @@ const AddProduct = () => {
         />
 
         {/* Description */}
-        <TextField
+        {/* <TextField
           fullWidth
           label="Description"
           name="description"
@@ -192,7 +250,7 @@ const AddProduct = () => {
           margin="normal"
           multiline
           rows={4}
-        />
+        /> */}
 
         {/* MRP Price */}
         <TextField
@@ -233,7 +291,7 @@ const AddProduct = () => {
             error={formik.touched.brand && Boolean(formik.errors.brand)}
           >
             {brandState.map((brand) => (
-              <MenuItem key={brand._id} value={brand._id}>
+              <MenuItem key={brand._id} value={brand.title}>
                 {brand.title}
               </MenuItem>
             ))}
@@ -251,8 +309,8 @@ const AddProduct = () => {
             error={formik.touched.category && Boolean(formik.errors.category)}
           >
             {catState.map((category) => (
-              <MenuItem key={category._id} value={category._id}>
-                {category.title}
+              <MenuItem key={category._id} value={category.name}>
+                {category.name}
               </MenuItem>
             ))}
           </Select>
@@ -318,23 +376,25 @@ const AddProduct = () => {
           <Select
             multiple
             name="color"
-            value={formik.values.color}
-            onChange={handleColorChange}
+            value={formik.values.color}  // Ensure formik.values.color is an array of _id
+            onChange={(event) => {
+              formik.setFieldValue("color", event.target.value); // Correctly update Formik state
+            }}
             onBlur={formik.handleBlur}
             error={formik.touched.color && Boolean(formik.errors.color)}
             renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => {
-                  const colorObj = colorState.find((color) => color._id === value);
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((id) => {
+                  const colorObj = colorState.find((color) => color._id === id);
                   return (
                     <Box
-                      key={value}
+                      key={id}
                       sx={{
                         width: 20,
                         height: 20,
-                        backgroundColor: colorObj ? colorObj.title : 'transparent',
-                        border: '1px solid #ccc',
-                        borderRadius: '50%',
+                        backgroundColor: colorObj ? colorObj.title : "transparent",
+                        border: "1px solid #ccc",
+                        borderRadius: "50%",
                       }}
                     />
                   );
@@ -343,15 +403,15 @@ const AddProduct = () => {
             )}
           >
             {colorState.map((color) => (
-              <MenuItem key={color._id} value={color._id}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <MenuItem key={color._id} value={color._id}> {/* Store _id instead of title */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Box
                     sx={{
                       width: 20,
                       height: 20,
                       backgroundColor: color.title,
-                      border: '1px solid #ccc',
-                      borderRadius: '50%',
+                      border: "1px solid #ccc",
+                      borderRadius: "50%",
                     }}
                   />
                   <Typography>{color.title}</Typography>
@@ -360,6 +420,7 @@ const AddProduct = () => {
             ))}
           </Select>
         </FormControl>
+
 
         {/* New Arrived Product */}
         <FormControlLabel
@@ -413,7 +474,7 @@ const AddProduct = () => {
           )}
         </Dropzone>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 2 }}>
-          {imgState.map((image, index) => (
+          {images.map((image, index) => (
             <Box key={index} sx={{ position: "relative" }}>
               <Button
                 sx={{ position: "absolute", top: 0, right: 0, color: "red" }}
@@ -421,14 +482,21 @@ const AddProduct = () => {
               >
                 X
               </Button>
-              <img src={image.url} alt={`uploaded-${index}`} width={100} height={100} />
+              <img src={image.url} alt={`uploaded-${index}`} width={200} height={200} />
             </Box>
           ))}
         </Box>
 
+        <JoditEditor
+          ref={editor}
+          value={formik.values.description}
+          onChange={(content) => formik.setFieldValue("description", content)}
+          onBlur={() => formik.setFieldTouched("description", true)}
+        />;
+
         {/* Submit Button */}
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
-          {getProductId !== undefined ? "Update" : "Add"} Product
+          {id ? "Update" : "Add"} Product
         </Button>
       </form>
     </Box>

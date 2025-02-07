@@ -107,13 +107,19 @@ export const productSlice = createSlice({
         state.isError = false;
         state.isSuccess = true;
         state.productName = action.payload.title;
-        state.productDesc = action.payload.description;
-        state.productPrice = action.payload.price;
+        state.shortDescription = action.payload.shortDescription;
+        state.description = action.payload.description;
+        state.mrp_price = action.payload.mrp_price;
+        state.selling_price = action.payload.selling_price;
         state.productBrand = action.payload.brand;
         state.productCategory = action.payload.category;
-        state.productTag = action.payload.tags;
+        state.sizes = action.payload.sizes;
+        state.tags = action.payload.tags;
         state.productColors = action.payload.color;
         state.productQuantity = action.payload.quantity;
+        state.newarrivedproduct = action.payload.newarrivedproduct;
+        state.trendingproduct = action.payload.trendingproduct;
+        state.featuredproduct = action.payload.featuredproduct;
 
         state.productImages = action.payload.images;
       })

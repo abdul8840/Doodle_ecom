@@ -2,14 +2,30 @@ import Product from "../models/productModel.js";
 import slugify from 'slugify';
 import validateMongoDbId from "../utils/validateMongoDbId.js";
 
+const createUniqueSlug = async (title) => {
+  let slug = slugify(title, { lower: true, strict: true });
+  let existingProduct = await Product.findOne({ slug });
+
+  let count = 1;
+  while (existingProduct) {
+    slug = `${slug}-${count}`;
+    existingProduct = await Product.findOne({ slug });
+    count++;
+  }
+
+  return slug;
+};
+
 export const createProduct = async (req, res) => {
   try {
     if (req.body.title) {
-      req.body.slug = slugify(req.body.title);
+      req.body.slug = await createUniqueSlug(req.body.title);
     }
+
     const newProduct = await Product.create(req.body);
     res.status(201).json({ message: "Product created successfully", newProduct });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to create product", error });
   }
 };
@@ -26,6 +42,7 @@ export const updateProduct = async (req, res) => {
     });
     res.status(200).json({ message: "Product updated successfully", updateProduct });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "Failed to update product", error });
   }
 };

@@ -6,18 +6,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteAProduct, getProducts } from "../features/product/productSlice";
 import { Link } from "react-router-dom";
 import { delImg } from "../features/upload/uploadSlice";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { 
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, 
+  TextField, CircularProgress 
+} from "@mui/material";
 
 const ProductList = () => {
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  const productState = useSelector((state) => state?.product?.products);
+  const { products, loading } = useSelector((state) => state?.product);
 
   const handleDelete = (id) => {
     setProductId(id);
@@ -30,11 +34,19 @@ const ProductList = () => {
     setOpen(false);
     setTimeout(() => {
       dispatch(getProducts());
-    }, 100);
+    }, 500);
   };
 
   const columns = [
     { field: "id", headerName: "SNo", width: 70 },
+    {
+      field: "image",
+      headerName: "Image",
+      width: 120,
+      renderCell: (params) => (
+        <img src={params.value} alt="Product" className="w-16 h-16 object-cover rounded" />
+      ),
+    },
     { field: "title", headerName: "Title", width: 200 },
     { field: "brand", headerName: "Brand", width: 150 },
     { field: "category", headerName: "Category", width: 150 },
@@ -60,27 +72,53 @@ const ProductList = () => {
     },
   ];
 
-  const rows = productState.map((product, index) => ({
-    id: index + 1,
-    _id: product._id,
-    title: product.title,
-    brand: product.brand,
-    category: product.category,
-    quantity: product.quantity,
-    price: product.price,
-  }));
+  const filteredRows = products
+    ?.filter((product) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .map((product, index) => ({
+      id: index + 1,
+      _id: product._id,
+      title: product.title,
+      image: product.images?.[0]?.url,
+      brand: product.brand,
+      category: product.category,
+      quantity: product.quantity,
+      price: product.selling_price,
+    }));
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Products</h3>
+      <h3 className="text-xl font-semibold mb-4">Products</h3>
+      
+      {/* Search Filter */}
+      <TextField
+        label="Search Product"
+        variant="outlined"
+        fullWidth
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-4"
+      />
+
+      {/* Create Product Button */}
+      <div className="mb-4">
         <Link to="/create-product">
           <Button variant="contained" color="primary">Add Product</Button>
         </Link>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <DataGrid rows={rows} columns={columns} pageSize={5} autoHeight />
-      </div>
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <DataGrid rows={filteredRows} columns={columns} pageSize={5} autoHeight />
+        </div>
+      )}
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Delete Product</DialogTitle>

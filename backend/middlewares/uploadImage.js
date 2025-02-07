@@ -1,7 +1,7 @@
 import multer from "multer";
 import sharp from "sharp";
 import path from "path";
-import fs from "fs-extra";  // Import fs-extra to handle file system operations
+import fs from "fs";  // Import fs-extra to handle file system operations
 import { fileURLToPath } from "url";
 
 // Define __dirname manually for ES module
@@ -11,11 +11,9 @@ const __dirname = path.dirname(__filename);
 // Storage configuration for Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Define the destination folder for uploaded files
     cb(null, path.join(__dirname, "../public/images/"));
   },
   filename: function (req, file, cb) {
-    // Generate a unique filename
     const uniquesuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, file.fieldname + "-" + uniquesuffix + ".jpeg");
   },
@@ -34,7 +32,7 @@ const multerFilter = (req, file, cb) => {
 const uploadPhoto = multer({
   storage: storage,
   fileFilter: multerFilter,
-  limits: { fileSize: 1000000 }, // Limit file size to 1MB
+  limits: { fileSize: 1000000 },
 });
 
 // Product image resizing function
@@ -69,23 +67,18 @@ const uploadPhoto = multer({
 
 // Blog image resizing function (similar to product image resizing)
 const blogImgResize = async (req, res, next) => {
-  if (!req.files) return next();  // If no files are uploaded, skip resizing
-
+  if (!req.files) return next();
   await Promise.all(
     req.files.map(async (file) => {
-      // Resize and save the image
       await sharp(file.path)
-        .resize(300, 300)  // Resize to 300x300 pixels
-        .toFormat("jpeg")  // Convert to JPEG
-        .jpeg({ quality: 90 })  // Set quality to 90%
-        .toFile(`public/images/blogs/${file.filename}`);  // Save resized file
-
-      // Remove the original uploaded file
-      await fs.remove(file.path);  // Use fs-extra's remove() for file deletion
+        .resize(300, 300)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/images/blogs/${file.filename}`);
+      fs.unlinkSync(`public/images/blogs/${file.filename}`);
     })
   );
-
-  next(); // Continue to next middleware
+  next();
 };
 
 // Export functions for use in routes

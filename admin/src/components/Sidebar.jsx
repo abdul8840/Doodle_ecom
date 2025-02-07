@@ -22,7 +22,7 @@ const Sidebar = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <div className={`h-screen bg-gray-50 shadow-lg text-black p-4 transition-all duration-300 ${isExpanded ? "w-64" : "w-16"}`}>
+      <div className={`h-screen bg-gray-50 shadow-lg text-black p-4 transition-all duration-300  ${isExpanded ? "w-64" : "w-16"}`}>
         {/* Sidebar Toggle Button */}
 
         <div className="flex justify-between border-b pb-2">

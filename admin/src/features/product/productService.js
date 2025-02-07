@@ -9,8 +9,11 @@ const getProducts = async () => {
 };
 const createProduct = async (product) => {
   const response = await axios.post(`${base_url}product/create-product`, product, config);
-
+  if(!response.ok){
+    console.log(error)
+  }
   return response.data;
+  
 };
 
 const getProduct = async (id) => {
@@ -24,7 +27,7 @@ const updateProduct = async (product) => {
     `${base_url}product/update-product/${product.id}`,
     {
       title: product.productData.title,
-      slug: product.productData.slug,
+      // slug: product.productData.slug,
       shortDescription: product.productData.shortDescription,
       description: product.productData.description,
       mrp_price: product.productData.mrp_price,

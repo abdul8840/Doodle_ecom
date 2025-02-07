@@ -71,8 +71,8 @@ const productSchema = mongoose.Schema({
   },
   color: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Color",
+      type: String,
+      required: true
     },
   ],
   images: [
