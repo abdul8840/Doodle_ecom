@@ -57,9 +57,17 @@ const updateUser = async (data) => {
   }
 };
 
+const getUserWislist = async () => {
+  const response = await axios.get(`${base_url}/auth/wishlist`, config);
+  if (response.data) {
+    return response.data;
+  }
+};
+
 
 export const authService = {
   signup,
   signin,
   updateUser,
+  getUserWislist,
 }

@@ -1,6 +1,7 @@
 import Product from "../models/productModel.js";
 import slugify from 'slugify';
 import validateMongoDbId from "../utils/validateMongoDbId.js";
+import User from "../models/userModel.js";
 
 const createUniqueSlug = async (title) => {
   let slug = slugify(title, { lower: true, strict: true });
@@ -111,6 +112,40 @@ export const getAllProduct = async (req, res) => {
     }
     const product = await query;
     res.json(product);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const addToWishlist = async (req, res) => {
+  const { _id } = req.user;
+  const { prodId } = req.body;
+  try {
+    const user = await User.findById(_id);
+    const alreadyadded = user.wishlist.find((id) => id.toString() === prodId);
+    if (alreadyadded) {
+      let user = await User.findByIdAndUpdate(
+        _id,
+        {
+          $pull: { wishlist: prodId },
+        },
+        {
+          new: true,
+        }
+      );
+      res.json(user);
+    } else {
+      let user = await User.findByIdAndUpdate(
+        _id,
+        {
+          $push: { wishlist: prodId },
+        },
+        {
+          new: true,
+        }
+      );
+      res.json(user);
+    }
   } catch (error) {
     throw new Error(error);
   }

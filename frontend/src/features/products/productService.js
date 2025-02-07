@@ -2,7 +2,6 @@ import axios from "axios";
 import { base_url, config } from "../../utils/config";
 
 const getProducts = async (data) => {
-  console.log(data);
   const response = await axios.get(
     `${base_url}/product/getall-product?${data?.brand ? `brand=${data?.brand}&&` : ""}${
       data?.tag ? `tags=${data?.tag}&&` : ""
@@ -25,7 +24,20 @@ const getSingleProduct = async (id) => {
   }
 };
 
+const addToWishlist = async (prodId) => {
+  const response = await axios.put(
+    `${base_url}/product/Wishlist`,
+    { prodId },
+    config
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
 export const productSevice = {
   getProducts,
   getSingleProduct,
+  addToWishlist,
 };
+

@@ -148,7 +148,7 @@ export const UpdateUser = async (req, res) => {
 
 export const getallUser = async (req,res) => {
   try {
-    const getUsers = await User.find()
+    const getUsers = await User.find().populate("wishlist");
     res.json(getUsers);
   } catch (error) {
     console.log(error);
@@ -187,4 +187,12 @@ export const makeAdmin = async (req, res) => {
   }
 };
 
-
+export const getWishlist = async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const findUser = await User.findById(_id).populate("wishlist");
+    res.json(findUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
