@@ -50,7 +50,7 @@ const BrandList = () => {
   return (
     <div className="p-6 bg-white shadow rounded-lg">
       <h3 className="text-xl font-semibold mb-4">Brands</h3>
-      
+
       <TextField
         label="Search Brands"
         variant="outlined"
@@ -58,6 +58,11 @@ const BrandList = () => {
         className="mb-4"
         onChange={(e) => setSearch(e.target.value)}
       />
+      <div className="mb-4">
+        <Link to="/create-brand">
+          <Button variant="contained" color="primary">Add Brand</Button>
+        </Link>
+      </div>
 
       <TableContainer component={Paper}>
         <Table>
@@ -76,7 +81,7 @@ const BrandList = () => {
                 <TableCell>{brand.title}</TableCell>
                 <TableCell>{brand.description}</TableCell>
                 <TableCell>
-                  <IconButton component={Link} to={`/create-brand/${brand._id}`} color="primary">
+                  <IconButton component={Link} to={`/create-brand/${brand._id}`} color="success">
                     <BiEdit />
                   </IconButton>
                   <IconButton

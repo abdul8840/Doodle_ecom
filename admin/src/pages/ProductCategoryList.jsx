@@ -60,7 +60,7 @@ const ProductCategoryList = () => {
       width: 150,
       renderCell: (params) => (
         <div className="flex mt-4">
-          <Link to={`/update-product-category/${params.row.id}`} className="text-blue-500">
+          <Link to={`/update-product-category/${params.row.id}`} className="text-green-600">
             <BiEdit size={20} />
           </Link>
           <button

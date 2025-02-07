@@ -57,7 +57,7 @@ const ProductList = () => {
       headerName: "Action",
       width: 150,
       renderCell: (params) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-4">
           <Link to={`/create-product/${params.row._id}`} className="text-green-600 text-lg">
             <BiEdit />
           </Link>

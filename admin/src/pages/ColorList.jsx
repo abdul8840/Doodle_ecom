@@ -46,7 +46,7 @@ const ColorList = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "SNo", width: 100, headerAlign: "center", align: "center" },
+    { field: "id", headerName: "SNo", width: 100, headerAlign: "center", align: "center"  },
     {
       field: "color",
       headerName: "Color",
@@ -72,12 +72,12 @@ const ColorList = () => {
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-          <Link to={`/create-color/${params.row.colorId}`} className="text-primary">
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, marginTop: "15px"}}>
+          <Link to={`/create-color/${params.row.colorId}`} className="text-green-600">
             <BiEdit size={20} />
           </Link>
           <button
-            className="bg-transparent border-0 text-danger"
+            className="bg-transparent border-0 text-danger text-red-600"
             onClick={() => showModal(params.row.colorId)}
           >
             <AiFillDelete size={20} />
