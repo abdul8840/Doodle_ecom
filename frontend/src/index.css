@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.image-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+}
+
+.main-image {
+  width: 100%;
+  display: block;
+}
+
+.zoom-box {
+  position: absolute;
+  border-radius: 100%;
+  width: 200px;
+  height: 200px;
+  border: 2px solid #000;
+  background-repeat: no-repeat;
+  display: none;
+  pointer-events: none;
+  transform: scale(2); /* Controls the zoom level */
+  transform-origin: center;
+}
+

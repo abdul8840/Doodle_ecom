@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts, addToWishlist } from "../features/products/productSlice";
 import { Card, CardContent, CardMedia, Typography, Button, IconButton } from "@mui/material";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const productState = useSelector((state) => state?.product?.product);
@@ -17,7 +19,15 @@ const Home = () => {
   }, [dispatch]);
 
   const toggleWishlist = (id) => {
+    const isInWishlist = wishlist.some((wishItem) => wishItem._id === id);
+    
     dispatch(addToWishlist(id));
+
+    if (isInWishlist) {
+      toast.info("Product successfully removed from wishlist");
+    } else {
+      toast.success("Product successfully added to wishlist");
+    }
   };
 
   return (
@@ -85,6 +95,8 @@ const Home = () => {
             })}
         </div>
       </div>
+      {/* Toast Container to show notifications */}
+      <ToastContainer position="top-right" autoClose={2000} />
     </section>
   );
 };

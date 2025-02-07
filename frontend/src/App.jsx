@@ -8,6 +8,7 @@ import Header from './components/Header/Header';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Wishlist from './pages/Wishlist';
+import ProductDetails from './pages/ProductDetails';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/sign-in" element={<Signin />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
 
 
         <Route element={<PrivateRoute />}>
