@@ -20,7 +20,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link } from "react-router-dom";
 
 const OurStore = () => {
-  const [grid, setGrid] = useState(2);
+  const [grid, setGrid] = useState(window.innerWidth < 768 ? 2 : 4);
   const dispatch = useDispatch();
   const productState = useSelector((state) => Array.isArray(state?.product?.product) ? state?.product?.product : []);
 
