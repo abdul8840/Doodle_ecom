@@ -69,12 +69,7 @@ const productSchema = mongoose.Schema({
     type: String,
     default: "Inactive",
   },
-  color: [
-    {
-      type: String,
-      required: true
-    },
-  ],
+  color: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
   images: [
     {
       public_id: String,
