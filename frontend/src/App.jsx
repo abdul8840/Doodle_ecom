@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Wishlist from './pages/Wishlist';
 import ProductDetails from './pages/ProductDetails';
+import OurStore from './pages/OurStore';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/sign-in" element={<Signin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/our-store" element={<OurStore />} />
 
 
         <Route element={<PrivateRoute />}>

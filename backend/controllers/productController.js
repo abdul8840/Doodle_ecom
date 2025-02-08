@@ -77,6 +77,7 @@ export const getAllProduct = async (req, res) => {
     const queryObj = { ...req.query };
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
+    
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
@@ -99,7 +100,7 @@ export const getAllProduct = async (req, res) => {
     } else {
       query = query.select("-__v");
     }
-
+    
     // pagination
 
     const page = req.query.page;

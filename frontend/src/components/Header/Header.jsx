@@ -123,7 +123,7 @@ const Header = () => {
             <NavLink to="/" className="hover:underline">
               Home
             </NavLink>
-            <NavLink to="/product" className="hover:underline">
+            <NavLink to="/our-store" className="hover:underline">
               Our Store
             </NavLink>
             <NavLink to="/blogs" className="hover:underline">
