@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { getAProduct, getAllProducts } from "../features/products/productSlice";
-import { Container, Grid, Typography, Box, Button } from "@mui/material";
+import { getAProduct, getAllProducts, addToWishlist } from "../features/products/productSlice";
+import { Container, Grid, Typography, Box, Button, IconButton } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState("");
@@ -17,6 +19,7 @@ const ProductDetails = () => {
   const getProductId = location.pathname.split("/")[2];
 
   const productState = useSelector((state) => state?.product?.singleproduct);
+  const wishlist = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
 
   useEffect(() => {
     dispatch(getAProduct(getProductId));
@@ -28,6 +31,8 @@ const ProductDetails = () => {
       setSelectedImage(productState.images[0].url);
     }
   }, [productState]);
+
+
 
   // Handle mouse movement for zoom effect
   const handleMouseMove = (e) => {
@@ -62,11 +67,29 @@ const ProductDetails = () => {
     });
   };
 
+  const isInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
+
+  const toggleWishlist = () => {
+    if (!productState?._id) return;
+  
+    const alreadyInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
+  
+    dispatch(addToWishlist(productState._id));
+  
+    if (alreadyInWishlist) {
+      toast.info("Product successfully removed from wishlist");
+    } else {
+      toast.success("Product successfully added to wishlist");
+    }
+  };
+  
+
+
   return (
     <Container className="py-5">
       <Grid container spacing={1} className="!mt-10 !p-10 bg-gray-50 shadow-xl rounded-2xl">
         {/* Left side (Images) */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} className="">
           <Box className="image-container">
             <img
               src={selectedImage}
@@ -113,22 +136,35 @@ const ProductDetails = () => {
               </div>
             </Typography>
             <div className="flex flex-col gap-2 mt-10">
-            <Typography variant="body1">
-              <strong>Category:</strong> {productState?.category}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Brand:</strong> {productState?.brand}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Category:</strong> {productState?.category}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Tags:</strong> {productState?.tags}
-            </Typography>
-            <Typography variant="body1">
-              <strong>In Stock:</strong> {productState?.quantity}
-            </Typography>
+              <Typography variant="body1">
+                <strong>Category:</strong> {productState?.category}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Brand:</strong> {productState?.brand}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Category:</strong> {productState?.category}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Tags:</strong> {productState?.tags}
+              </Typography>
+              <Typography variant="body1">
+                <strong>In Stock:</strong> {productState?.quantity}
+              </Typography>
             </div>
+
+            <Box className="flex items-center mt-4">
+              {/* Wishlist Button */}
+              <strong>Add To Wishlist:</strong>
+              <IconButton onClick={toggleWishlist} color="primary">
+                {isInWishlist ? (
+                  <AiFillHeart className="text-red-500 text-2xl" />
+                ) : (
+                  <AiOutlineHeart className="text-gray-500 text-2xl" />
+                )}
+              </IconButton>
+            </Box>
+
 
             {/* Size Selection */}
             <Box className="mt-4">
