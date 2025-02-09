@@ -88,7 +88,7 @@ const Cart = () => {
         <div className="text-center mt-8">
           <h3 className="text-xl font-semibold text-gray-700">Your cart is empty 😞</h3>
           <p className="text-gray-500 mt-2">Start shopping and add items to your cart.</p>
-          <Link to="/product" className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-block transition">Browse Products</Link>
+          <Link to="/our-store" className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-block transition">Browse Products</Link>
         </div>
       )}
 

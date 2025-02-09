@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Avatar, Menu, MenuItem, IconButton, Badge, Drawer } from "@mui/material";
 import { BsSearch, BsHeart, BsCart, BsList } from "react-icons/bs";
+import { getUserCart } from "../../features/user/userSlice";
 
 const Header = () => {
   const authState = useSelector((state) => state?.auth);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [total, setTotal] = useState(null);
+
+  const dispatch = useDispatch();
+
+  const cartState = useSelector((state) => state?.auth?.cartProducts);
+  const productState = useSelector((state) => state?.product?.product);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -29,6 +36,41 @@ const Header = () => {
     setIsDrawerOpen(open);
   };
 
+  const getTokenFromLocalStorage = localStorage.getItem("customer")
+    ? JSON.parse(localStorage.getItem("customer"))
+    : null;
+
+  const config2 = {
+    headers: {
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+      }`,
+      Accept: "application/json",
+    },
+  };
+
+  useEffect(() => {
+    dispatch(getUserCart(config2));
+  }, []);
+
+  const [productOpt, setProductOpt] = useState([]);
+  useEffect(() => {
+    let sum = 0;
+    for (let index = 0; index < cartState?.length; index++) {
+      sum = sum + Number(cartState[index].quantity) * cartState[index].price;
+      setTotal(sum);
+    }
+  }, [cartState]);
+
+  useEffect(() => {
+    let data = [];
+    for (let index = 0; index < productState?.length; index++) {
+      const element = productState[index];
+      data.push({ id: index, prod: element?._id, name: element?.title });
+    }
+    setProductOpt(data);
+  }, [productState]);
+
   return (
     <>
       {/* Top Header */}
@@ -41,8 +83,8 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Main Header */}
-      <header className="bg-white shadow-md py-4">
+      {/* Sticky Main Header */}
+      <header className="bg-white shadow-md py-4 sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center px-4">
           {/* Logo and Hamburger Menu (for small devices) */}
           <div className="flex items-center gap-4">
@@ -53,7 +95,7 @@ const Header = () => {
             >
               <BsList className="text-gray-700 text-xl" />
             </IconButton>
-            <h2 className="text-xlsm:text-2xl font-bold text-gray-800">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
               <Link to="/">Doodle Ecom</Link>
             </h2>
           </div>
@@ -73,22 +115,27 @@ const Header = () => {
             {/* Wishlist Icon */}
             <IconButton component={Link} to="/wishlist">
               <Badge badgeContent={0} color="secondary">
-                <BsHeart className="text-gray-700 text-xl" />
+                <BsHeart className="text-gray-700 text-xl hover:text-red-500 transition-colors" />
               </Badge>
             </IconButton>
 
-            {/* Cart Icon */}
-            <IconButton component={Link} to="/cart">
-              <Badge badgeContent={0} color="secondary">
-                <BsCart className="text-gray-700 text-xl" />
+            {/* Cart Icon with Count and Total */}
+            <IconButton component={Link} to="/cart" className="relative group">
+              <Badge badgeContent={cartState?.length || 0} color="secondary">
+                <BsCart className="text-gray-700 text-xl hover:text-blue-500 transition-colors" />
               </Badge>
+              {/* <div className="absolute -bottom-2 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-full transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
+                Rs. {!cartState?.length ? 0 : total ? total : 0}
+              </div> */}
             </IconButton>
 
             {/* User Avatar (inside the drawer for small screens) */}
             {authState?.user ? (
               <>
                 <IconButton onClick={handleMenuOpen} className="hidden lg:block">
-                  <Avatar>{authState.user.firstname.charAt(0)}</Avatar>
+                  <Avatar className="hover:shadow-lg transition-shadow">
+                    {authState.user.firstname.charAt(0)}
+                  </Avatar>
                 </IconButton>
                 <Menu
                   anchorEl={anchorEl}
@@ -108,7 +155,7 @@ const Header = () => {
                 </Menu>
               </>
             ) : (
-              <NavLink to="/sign-in" className="text-gray-700">
+              <NavLink to="/sign-in" className="text-gray-700 hover:text-blue-500 transition-colors">
                 Login
               </NavLink>
             )}
@@ -117,7 +164,7 @@ const Header = () => {
       </header>
 
       {/* Navigation Menu (for large devices) */}
-      <nav className="hidden lg:block bg-gray-800 py-2">
+      <nav className="hidden lg:block bg-gray-800 py-2 sticky top-16 z-40">
         <div className="container mx-auto px-4">
           <ul className="flex space-x-6 text-white">
             <NavLink to="/" className="hover:underline">
@@ -141,15 +188,14 @@ const Header = () => {
 
       {/* Drawer for Small Devices */}
       <Drawer anchor="left" open={isDrawerOpen} onClose={toggleDrawer(false)}>
-        
         <div className="w-64 p-4">
           <div className="py-5">
-          <div className="flex justify-between flex-col gap-1 border-b pb-1">
-          <p className="text-md sm:text-base">Free Shipping Over Rs.100</p>
-          <p className="text-md sm:text-base">
-            Hotline: <a href="tel:+918264954234" className="text-black">+91 8264954234</a>
-          </p>
-        </div>
+            <div className="flex justify-between flex-col gap-1 border-b pb-1">
+              <p className="text-md sm:text-base">Free Shipping Over Rs.100</p>
+              <p className="text-md sm:text-base">
+                Hotline: <a href="tel:+918264954234" className="text-black">+91 8264954234</a>
+              </p>
+            </div>
           </div>
           {/* User Avatar and Menu (only for small screens inside the drawer) */}
           {authState?.user && (
@@ -166,7 +212,7 @@ const Header = () => {
             <NavLink to="/" className="block hover:underline">
               Home
             </NavLink>
-            <NavLink to="/product" className="block hover:underline">
+            <NavLink to="/our-store" className="block hover:underline">
               Our Store
             </NavLink>
             <NavLink to="/blogs" className="block hover:underline">
