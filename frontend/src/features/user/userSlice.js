@@ -101,6 +101,8 @@ export const updateCartProduct = createAsyncThunk(
   }
 );
 
+export const resetState = createAction("Reset_all");
+
 const getCustomerfromLocalStorage = localStorage.getItem("customer")
   ? JSON.parse(localStorage.getItem("customer"))
   : null;

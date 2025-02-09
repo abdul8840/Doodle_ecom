@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAProduct, getAllProducts, addToWishlist } from "../features/products/productSlice";
-import { Container, Grid, Typography, Box, Button, IconButton } from "@mui/material";
+import { Container, Grid, Typography, Box, Button, IconButton, Alert } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { addProdToCart, getUserCart } from "../features/user/userSlice";
 
 const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState("");
@@ -13,17 +14,23 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [showDescription, setShowDescription] = useState(false); // Toggle state for description
+  const [alreadyAdded, setAlreadyAdded] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const getProductId = location.pathname.split("/")[2];
 
   const productState = useSelector((state) => state?.product?.singleproduct);
   const wishlist = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
+  //cart
+  const cartState = useSelector((state) => state?.auth?.cartProducts);
 
   useEffect(() => {
     dispatch(getAProduct(getProductId));
     dispatch(getAllProducts());
+    dispatch(getUserCart());
   }, [dispatch, getProductId]);
 
   useEffect(() => {
@@ -32,7 +39,35 @@ const ProductDetails = () => {
     }
   }, [productState]);
 
+  //handle cart
+  useEffect(() => {
+    for (let index = 0; index < cartState?.length; index++) {
+      if (getProductId === cartState[index]?.productId?._id) {
+        setAlreadyAdded(true);
+      }
+    }
+  });
 
+  const uploadCart = () => {
+    if (selectedColor === null) {
+      setShowAlert(true);
+      toast.error("Please choose Color");
+    } else if (selectedSize === null) {
+      setShowAlert(true);
+      toast.error("Please choose Size");
+    } else {
+      dispatch(
+        addProdToCart({
+          productId: productState?._id,
+          quantity: 1,
+          color: selectedColor,
+          selling_price: productState?.selling_price,
+          size: selectedSize,
+        })
+      );
+      navigate("/cart");
+    }
+  };
 
   // Handle mouse movement for zoom effect
   const handleMouseMove = (e) => {
@@ -54,36 +89,21 @@ const ProductDetails = () => {
     setZoomStyle({ display: "none" });
   };
 
-  const handleAddToCart = () => {
-    if (!selectedColor || !selectedSize) {
-      alert("Please select a size and a color before adding to cart.");
-      return;
-    }
-
-    console.log("Added to cart:", {
-      productId: getProductId,
-      color: selectedColor,
-      size: selectedSize,
-    });
-  };
-
   const isInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
 
   const toggleWishlist = () => {
     if (!productState?._id) return;
-  
+
     const alreadyInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
-  
+
     dispatch(addToWishlist(productState._id));
-  
+
     if (alreadyInWishlist) {
       toast.info("Product successfully removed from wishlist");
     } else {
       toast.success("Product successfully added to wishlist");
     }
   };
-  
-
 
   return (
     <Container className="py-5">
@@ -165,7 +185,6 @@ const ProductDetails = () => {
               </IconButton>
             </Box>
 
-
             {/* Size Selection */}
             <Box className="mt-4">
               <Typography variant="body1"><strong>Select Size:</strong></Typography>
@@ -205,12 +224,19 @@ const ProductDetails = () => {
             <Button
               variant="contained"
               color="primary"
-              disabled={!selectedColor || !selectedSize}
               className="!mt-6 !p-3 !text-lg"
-              onClick={handleAddToCart}
+              onClick={() => {
+                alreadyAdded ? navigate("/cart") : uploadCart();
+              }}
             >
-              Add to Cart
+              {alreadyAdded ? "Go to Cart" : "Add to Cart"}
             </Button>
+
+            {showAlert && ( // Only render if showAlert is true
+          <Alert severity="error" className="mt-2"> {/* Added margin top for spacing */}
+            Please select color and size
+          </Alert>
+        )}
 
             {/* Product Description Toggle */}
             <Box className="mt-6">

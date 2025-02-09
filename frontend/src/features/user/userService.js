@@ -72,7 +72,7 @@ const addToCart = async (cartData) => {
 };
 
 const getCart = async (data) => {
-  const response = await axios.get(`${base_url}/auth/get-cart`, data);
+  const response = await axios.get(`${base_url}/auth/get-cart`, config);
   if (response.data) {
     return response.data;
   }
@@ -80,9 +80,7 @@ const getCart = async (data) => {
 
 const removeProductFromCart = async (data) => {
   const response = await axios.delete(
-    `${base_url}/auth/delete-product-cart/${data.id}`,
-
-    data.config2
+    `${base_url}/auth/delete-product-cart/${data.id}`, config
   );
   if (response.data) {
     return response.data;

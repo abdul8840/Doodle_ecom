@@ -17,6 +17,7 @@ export const userCart = async (req, res) => {
     }).save();
     res.status(201).json({ message: 'Product added to cart', newCart });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error adding product to cart' });
   }
 };
@@ -30,6 +31,7 @@ export const getUserCart = async (req, res) => {
       .populate("color");
     res.json(cart);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error fetching user cart' });
   }
 };
@@ -45,6 +47,7 @@ export const removeProductFromCart = async (req, res) => {
     });
     res.json(deleteProductFromcart);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error removing product from cart' });
   }
 };
@@ -58,6 +61,7 @@ export const emptyCart = async (req, res) => {
     });
     res.json(deleteCart);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error emptying cart' });
   }
 };
@@ -75,6 +79,7 @@ export const updateProductQuantityFromCart = async (req, res) => {
     cartItem.save();
     res.json(cartItem);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error updating product quantity' });
   }
 };
