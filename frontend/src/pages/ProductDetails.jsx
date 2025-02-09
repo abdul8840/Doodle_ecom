@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getAProduct, getAllProducts, addToWishlist } from "../features/products/productSlice";
+import { getuserProductWishlist } from "../features/user/userSlice";
 import { Container, Grid, Typography, Box, Button, IconButton, Alert } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
@@ -23,7 +24,8 @@ const ProductDetails = () => {
   const getProductId = location.pathname.split("/")[2];
 
   const productState = useSelector((state) => state?.product?.singleproduct);
-  const wishlist = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
+  const wishlistFromRedux = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
+  const [wishlist, setWishlist] = useState([]);
   //cart
   const cartState = useSelector((state) => state?.auth?.cartProducts);
 
@@ -31,6 +33,7 @@ const ProductDetails = () => {
     dispatch(getAProduct(getProductId));
     dispatch(getAllProducts());
     dispatch(getUserCart());
+    dispatch(getuserProductWishlist());
   }, [dispatch, getProductId]);
 
   useEffect(() => {
@@ -233,10 +236,10 @@ const ProductDetails = () => {
             </Button>
 
             {showAlert && ( // Only render if showAlert is true
-          <Alert severity="error" className="mt-2"> {/* Added margin top for spacing */}
-            Please select color and size
-          </Alert>
-        )}
+              <Alert severity="error" className="mt-2"> {/* Added margin top for spacing */}
+                Please select color and size
+              </Alert>
+            )}
 
             {/* Product Description Toggle */}
             <Box className="mt-6">

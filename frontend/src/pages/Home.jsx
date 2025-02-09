@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts, addToWishlist } from "../features/products/productSlice";
+import { getuserProductWishlist } from "../features/user/userSlice"; // Import wishlist action
 import { Card, CardContent, CardMedia, Typography, Button, IconButton } from "@mui/material";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,25 +10,40 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const productState = useSelector((state) => state?.product?.product);
-  const wishlist = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
+  const wishlistFromRedux = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Local state to store wishlist for real-time UI updates
+  const [wishlist, setWishlist] = useState([]);
+
   useEffect(() => {
     dispatch(getAllProducts());
+    dispatch(getuserProductWishlist());
   }, [dispatch]);
 
-  const toggleWishlist = (id) => {
-    const isInWishlist = wishlist.some((wishItem) => wishItem._id === id);
-    
-    dispatch(addToWishlist(id));
+  useEffect(() => {
+    setWishlist(wishlistFromRedux); // Sync Redux state with local state
+  }, [wishlistFromRedux]);
 
-    if (isInWishlist) {
-      toast.info("Product successfully removed from wishlist");
-    } else {
-      toast.success("Product successfully added to wishlist");
-    }
+  const toggleWishlist = async (id) => {
+    const isInWishlist = wishlist.some((wishItem) => wishItem._id === id);
+
+    await dispatch(addToWishlist(id)); 
+
+    // Update local state immediately for real-time UI update
+    setWishlist((prevWishlist) => {
+      if (isInWishlist) {
+        return prevWishlist.filter((wishItem) => wishItem._id !== id);
+      } else {
+        return [...prevWishlist, { _id: id }];
+      }
+    });
+
+    toast[isInWishlist ? "info" : "success"](
+      `Product successfully ${isInWishlist ? "removed from" : "added to"} wishlist`
+    );
   };
 
   return (
@@ -37,7 +53,7 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {productState &&
             productState.map((item, index) => {
-              const isInWishlist = wishlist.some((wishItem) => wishItem._id === item._id);
+              const isInWishlist = wishlist.some((wishItem) => wishItem._id === item?._id);
               return (
                 <Card
                   key={index}
@@ -95,7 +111,6 @@ const Home = () => {
             })}
         </div>
       </div>
-      {/* Toast Container to show notifications */}
       <ToastContainer position="top-right" autoClose={2000} />
     </section>
   );
