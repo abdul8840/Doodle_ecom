@@ -64,10 +64,58 @@ const getUserWislist = async () => {
   }
 };
 
+const addToCart = async (cartData) => {
+  const response = await axios.post(`${base_url}/auth/cart`, cartData, config);
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const getCart = async (data) => {
+  const response = await axios.get(`${base_url}/auth/get-cart`, data);
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const removeProductFromCart = async (data) => {
+  const response = await axios.delete(
+    `${base_url}/auth/delete-product-cart/${data.id}`,
+
+    data.config2
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const updateProductFromCart = async (cartDetail) => {
+  const response = await axios.delete(
+    `${base_url}/auth/update-product-cart/${cartDetail.cartItemId}/${cartDetail.quantity}`,
+    config
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const emptyCart = async (data) => {
+  const response = await axios.delete(`${base_url}/auth/empty-cart`, data);
+
+  if (response.data) {
+    return response.data;
+  }
+};
+
 
 export const authService = {
   signup,
   signin,
   updateUser,
   getUserWislist,
+  addToCart,
+  getCart,
+  removeProductFromCart,
+  updateProductFromCart,
+  emptyCart,
 }
