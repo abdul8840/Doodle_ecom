@@ -113,6 +113,7 @@ const Checkout = () => {
         product: cartState[index].productId._id,
         quantity: cartState[index].quantity,
         color: cartState[index].color._id,
+        size: cartState[index].size,
         selling_price: cartState[index].selling_price,
       });
     }
@@ -376,6 +377,9 @@ const Checkout = () => {
                     <div className="relative">
                       <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs rounded-full px-2 py-1">
                         {item.quantity}
+                      </span>
+                      <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs rounded-full px-2 py-1">
+                        {item.size}
                       </span>
                       <img
                         src={item.productId.images[0].url}
