@@ -4,6 +4,7 @@ import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
 import { emptyCart, getUserCart, removeProductFromCart, updateProductQuantityFromCart, userCart } from '../controllers/cartController.js';
 import { createOrder, getAllOrders, getMonthWiseOrderIncome, getMyOrders, getsingleOrder, getYearlyTotalOrder, updateOrder } from '../controllers/orderController.js';
 import { checkout, paymentVerification } from '../controllers/paymentController.js';
+import { addressForUser, addressList, addressSingle, createaddress, deleteAddress, updateAddress } from '../controllers/addressController.js';
 
 const router = express.Router();
 
@@ -49,5 +50,14 @@ router.get("/getaOrder/:id", authMiddleware, isAdmin, getsingleOrder);
 router.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
 router.get("/getMonthWiseOrderIncome", authMiddleware, getMonthWiseOrderIncome);
 router.get("/getyearlyorders", authMiddleware, getYearlyTotalOrder);
+
+//Address Routes
+
+router.post('/create-address',createaddress)
+router.get('/user-address',addressForUser)
+router.get('/get-address',addressList)
+router.get('/get-address/:id',addressSingle)
+router.patch('/address/:id',updateAddress)
+router.delete('/address/:id',deleteAddress)
 
 export default router;
