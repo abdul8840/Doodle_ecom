@@ -107,7 +107,7 @@ const emptyCart = async (data) => {
 
 const createOrder = async (orderDetail) => {
   const response = await axios.post(
-    `${base_url}user/cart/create-order/`,
+    `${base_url}/auth/cart/create-order/`,
     orderDetail,
     config
   );
@@ -117,7 +117,7 @@ const createOrder = async (orderDetail) => {
 };
 
 const getUserOrders = async () => {
-  const response = await axios.get(`${base_url}user/getmyorders`, config);
+  const response = await axios.get(`${base_url}/auth/getmyorders`, config);
 
   if (response.data) {
     return response.data;

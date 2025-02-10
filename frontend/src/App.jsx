@@ -11,6 +11,8 @@ import Wishlist from './pages/Wishlist';
 import ProductDetails from './pages/ProductDetails';
 import OurStore from './pages/OurStore';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import Orders from './pages/Orders';
 
 const App = () => {
   return (
@@ -28,6 +30,10 @@ const App = () => {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/my-profile" element={<Profile />} />
           <Route path="/cart" element={<Cart />} />
+
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/my-orders" element={<Orders />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

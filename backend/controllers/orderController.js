@@ -1,4 +1,4 @@
-import Order from "../models/orderModel";
+import Order from "../models/orderModel.js";
 
 export const createOrder = async (req, res) => {
   const {
@@ -23,6 +23,7 @@ export const createOrder = async (req, res) => {
       success: true,
     });
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };
@@ -36,6 +37,7 @@ export const getMyOrders = async (req, res) => {
       .populate("orderItems.color");
       res.json({ orders, success: true });
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };
@@ -48,6 +50,7 @@ export const getAllOrders = async (req, res) => {
     // .populate("orderItems.color");
     res.json({ orders, success: true });
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };
@@ -63,6 +66,7 @@ export const getsingleOrder = async (req, res) => {
       orders,
     });
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };
@@ -75,6 +79,7 @@ export const updateOrder = async (req, res) => {
     await orders.save();
     res.json({ orders, success: true });
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };
