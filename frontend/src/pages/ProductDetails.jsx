@@ -235,8 +235,8 @@ const ProductDetails = () => {
               {alreadyAdded ? "Go to Cart" : "Add to Cart"}
             </Button>
 
-            {showAlert && ( // Only render if showAlert is true
-              <Alert severity="error" className="mt-2"> {/* Added margin top for spacing */}
+            {showAlert && ( 
+              <Alert severity="error" className="mt-2">
                 Please select color and size
               </Alert>
             )}

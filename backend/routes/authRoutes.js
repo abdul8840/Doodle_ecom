@@ -2,6 +2,7 @@ import express from 'express'
 import { adminSignin, Signin, Signout, Signup, UpdateUser, getallUser, deleteUser, makeAdmin, getWishlist } from '../controllers/authController.js';
 import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
 import { emptyCart, getUserCart, removeProductFromCart, updateProductQuantityFromCart, userCart } from '../controllers/cartController.js';
+import { createOrder, getAllOrders, getMonthWiseOrderIncome, getMyOrders, getsingleOrder, getYearlyTotalOrder, updateOrder } from '../controllers/orderController.js';
 
 const router = express.Router();
 
@@ -32,5 +33,15 @@ router.delete(
   updateProductQuantityFromCart
 );
 router.delete("/empty-cart", authMiddleware, emptyCart);
+
+//order Routes
+
+router.post("/cart/create-order", authMiddleware, createOrder);
+router.get("/getmyorders", authMiddleware, getMyOrders);
+router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
+router.get("/getaOrder/:id", authMiddleware, isAdmin, getsingleOrder);
+router.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
+router.get("/getMonthWiseOrderIncome", authMiddleware, getMonthWiseOrderIncome);
+router.get("/getyearlyorders", authMiddleware, getYearlyTotalOrder);
 
 export default router;
