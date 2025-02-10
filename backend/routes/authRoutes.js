@@ -3,6 +3,7 @@ import { adminSignin, Signin, Signout, Signup, UpdateUser, getallUser, deleteUse
 import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
 import { emptyCart, getUserCart, removeProductFromCart, updateProductQuantityFromCart, userCart } from '../controllers/cartController.js';
 import { createOrder, getAllOrders, getMonthWiseOrderIncome, getMyOrders, getsingleOrder, getYearlyTotalOrder, updateOrder } from '../controllers/orderController.js';
+import { checkout, paymentVerification } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
@@ -33,6 +34,11 @@ router.delete(
   updateProductQuantityFromCart
 );
 router.delete("/empty-cart", authMiddleware, emptyCart);
+
+// Checkout and payment Routes
+
+router.post("/order/checkout", authMiddleware, checkout);
+router.post("/order/paymentVerification", authMiddleware, paymentVerification);
 
 //order Routes
 
