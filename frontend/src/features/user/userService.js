@@ -105,6 +105,25 @@ const emptyCart = async (data) => {
   }
 };
 
+const createOrder = async (orderDetail) => {
+  const response = await axios.post(
+    `${base_url}user/cart/create-order/`,
+    orderDetail,
+    config
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const getUserOrders = async () => {
+  const response = await axios.get(`${base_url}user/getmyorders`, config);
+
+  if (response.data) {
+    return response.data;
+  }
+};
+
 
 export const authService = {
   signup,
@@ -116,4 +135,6 @@ export const authService = {
   removeProductFromCart,
   updateProductFromCart,
   emptyCart,
+  createOrder,
+  getUserOrders
 }

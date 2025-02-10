@@ -101,6 +101,28 @@ export const updateCartProduct = createAsyncThunk(
   }
 );
 
+export const getOrders = createAsyncThunk(
+  "user/orders/get",
+  async (thunkAPI) => {
+    try {
+      return await authService.getUserOrders();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const createAnOrder = createAsyncThunk(
+  "user/cart/create-order",
+  async (orderDetail, thunkAPI) => {
+    try {
+      return await authService.createOrder(orderDetail);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const resetState = createAction("Reset_all");
 
 const getCustomerfromLocalStorage = localStorage.getItem("customer")
@@ -299,6 +321,42 @@ const authSlice = createSlice({
         state.deletedCart = action.payload;
       })
       .addCase(deleteUserCart.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(createAnOrder.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(createAnOrder.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.orderedProduct = action.payload;
+        if (state.isSuccess) {
+          toast.success("Ordered createad Successfully!");
+        }
+      })
+      .addCase(createAnOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+        if (state.isError) {
+          toast.error("Something Went Wrong!");
+        }
+      })
+      .addCase(getOrders.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getOrders.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.getorderedProduct = action.payload;
+      })
+      .addCase(getOrders.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
