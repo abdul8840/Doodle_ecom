@@ -97,6 +97,12 @@ const Sidebar = () => {
           </li>
           
           <li>
+            <NavLink to="/orders" className={({ isActive }) => `flex items-center space-x-4 p-2 rounded ${isActive ? activeClass : defaultClass}`}>
+              <Info />
+              {isExpanded && <span>Orders</span>}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/home" className={({ isActive }) => `flex items-center space-x-4 p-2 rounded ${isActive ? activeClass : defaultClass}`}>
               <Info />
               {isExpanded && <span>Home</span>}

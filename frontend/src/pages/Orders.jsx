@@ -34,7 +34,7 @@ const Orders = () => {
     { status: "Ordered", icon: <ShoppingCartIcon /> },
     { status: "Processed", icon: <SettingsIcon /> },
     { status: "Shipped", icon: <LocalShippingIcon /> },
-    { status: "Out_For_Delivery", icon: <DirectionsBikeIcon /> },
+    { status: "Out_for_Delivery", icon: <DirectionsBikeIcon /> },
     { status: "Delivered", icon: <CheckCircleIcon /> },
   ];
 
