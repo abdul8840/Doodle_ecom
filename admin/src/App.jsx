@@ -17,6 +17,7 @@ import AddColor from "./pages/AddColor";
 import ProductList from "./pages/ProductList";
 import AddProduct from "./pages/AddProduct";
 import Orders from "./pages/Orders";
+import ViewOrder from "./pages/ViewOrder";
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
             <Route path="create-product" element={<AddProduct />} />
             <Route path="create-product/:id" element={<AddProduct />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="order/:id" element={<ViewOrder />} />
             <Route path="home" element={<Home />} />
             <Route path="settings" element={<Setting />} />
           </Route>

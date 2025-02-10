@@ -7,6 +7,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import ListIcon from '@mui/icons-material/List';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useSelector } from "react-redux";
 
 const Sidebar = () => {
@@ -98,7 +99,7 @@ const Sidebar = () => {
           
           <li>
             <NavLink to="/orders" className={({ isActive }) => `flex items-center space-x-4 p-2 rounded ${isActive ? activeClass : defaultClass}`}>
-              <Info />
+              <ShoppingBagIcon />
               {isExpanded && <span>Orders</span>}
             </NavLink>
           </li>

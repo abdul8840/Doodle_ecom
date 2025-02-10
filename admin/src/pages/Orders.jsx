@@ -20,14 +20,14 @@ const Orders = () => {
   const columns = [
     { field: "id", headerName: "SNo", width: 90 },
     { field: "name", headerName: "Name", width: 200 },
-    { field: "amount", headerName: "Amount ($)", width: 150 },
+    { field: "amount", headerName: "Amount (₹)", width: 150 },
     { field: "date", headerName: "Date", width: 200 },
     {
       field: "product",
       headerName: "Product",
       width: 180,
       renderCell: (params) => (
-        <Link to={`/admin/order/${params.row._id}`} className="text-blue-500 underline">
+        <Link to={`/order/${params.row._id}`} className="text-blue-500 underline">
           View Orders
         </Link>
       ),
