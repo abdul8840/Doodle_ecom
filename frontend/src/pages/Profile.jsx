@@ -221,9 +221,19 @@ const Profile = () => {
                       </Box>
                     </form>
                   ) : (
-                    <div>
-                      <p>{item.firstname} {item.lastname}, {item.address1}, {item.city}, {item.state}, {item.country} - {item.pincode}</p>
-                      <FiEdit onClick={() => handleEditAddress(item)} style={{ cursor: "pointer" }} />
+                    <div className="flex justify-between">
+                      <div className="">
+                      <h2 className="text-lg"><strong>Name: </strong>{item.firstname} {item.lastname}</h2>
+                      <p className="text-sm"><strong>Email: </strong>{item.email} </p>
+                      <p className="text-sm"><strong>Mobile no: </strong>{item.mobile} </p>
+                      <p className="text-sm"><strong>Address1: </strong>{item.address1} </p>
+                      <p className="text-sm"><strong>Address2: </strong>{item.address2} </p>
+                      <p className="text-sm"><strong>Pincode: </strong>{item.pincode} </p>
+                      <p className="text-sm"><strong>City: </strong>{item.city} </p>
+                      <p className="text-sm"><strong>State: </strong>{item.state} </p>
+                      <p className="text-sm"><strong>Country: </strong>{item.country} </p>
+                      </div>
+                      <FiEdit className="text-green-600 font-fold text-2xl" onClick={() => handleEditAddress(item)} style={{ cursor: "pointer" }} />
                     </div>
                   )}
                 </div>

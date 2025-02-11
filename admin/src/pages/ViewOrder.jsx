@@ -54,9 +54,14 @@ const ViewOrder = () => {
         {/* Main Order Details */}
         <div className="mb-6">
           <h4 className="text-lg font-semibold">Shipping Address:</h4>
-          <p>{orderState?.shippingInfo?.firstname} {orderState?.shippingInfo?.lastname}</p>
-          <p>{orderState?.shippingInfo?.address}, {orderState?.shippingInfo?.city}</p>
-          <p>{orderState?.shippingInfo?.state} - {orderState?.shippingInfo?.pincode}</p>
+          <h2 className="text-lg font-[400]"><strong>Name:</strong> {orderState?.shippingInfo?.firstname} {orderState?.shippingInfo?.lastname}</h2>
+          <p className="text-gray-600"><strong>Email:</strong> {orderState?.shippingInfo?.email}</p>
+          <p className="text-gray-600"><strong>Mobile no:</strong> {orderState?.shippingInfo?.mobile}</p>
+          <p className="text-gray-600"><strong>Address:</strong> {orderState?.shippingInfo?.address1}, {orderState?.shippingInfo?.address2}</p>
+          <p className="text-gray-600"><strong>City:</strong> {orderState?.shippingInfo?.city}</p>
+          <p className="text-gray-600"><strong>State:</strong> {orderState?.shippingInfo?.state}</p>
+          <p className="text-gray-600"><strong>Pincode:</strong> {orderState?.shippingInfo?.pincode}</p>
+
         </div>
 
         {/* Order Items Table */}
@@ -94,9 +99,13 @@ const ViewOrder = () => {
           {/* User Info */}
           <div style={{ marginBottom: "20px" }}>
             <h3>Shipping Address:</h3>
-            <p><strong>Name:</strong> {orderState?.shippingInfo?.firstname} {orderState?.shippingInfo?.lastname}</p>
-            <p><strong>Address:</strong>{orderState?.shippingInfo?.other}, {orderState?.shippingInfo?.address}, {orderState?.shippingInfo?.city}</p>
-            <p><strong>State:</strong> {orderState?.shippingInfo?.state} - {orderState?.shippingInfo?.pincode}</p>
+            <h2 className="text-lg font-[400]"><strong>Name:</strong> {orderState?.shippingInfo?.firstname} {orderState?.shippingInfo?.lastname}</h2>
+            <p className="text-gray-600"><strong>Email:</strong> {orderState?.shippingInfo?.email}</p>
+            <p className="text-gray-600"><strong>Mobile no:</strong> {orderState?.shippingInfo?.mobile}</p>
+            <p className="text-gray-600"><strong>Address:</strong> {orderState?.shippingInfo?.address1}, {orderState?.shippingInfo?.address2}</p>
+            <p className="text-gray-600"><strong>City:</strong> {orderState?.shippingInfo?.city}</p>
+            <p className="text-gray-600"><strong>State:</strong> {orderState?.shippingInfo?.state}</p>
+            <p className="text-gray-600"><strong>Pincode:</strong> {orderState?.shippingInfo?.pincode}</p>
           </div>
 
           {/* Order Items */}
@@ -124,6 +133,11 @@ const ViewOrder = () => {
               ))}
             </tbody>
           </table>
+
+          <div className="w-full flex justify-between border-2 border-black mt-1 p-2">
+            <h2 className="text-lg font-bold">Total Price:</h2>
+            <p className="text-md font-semibold">₹{orderState?.totalPrice}</p>
+          </div>
 
         </div>
       </div>

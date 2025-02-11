@@ -253,8 +253,9 @@ const Checkout = () => {
               Abdul Rahman (abdul01@gmail.com)
             </p>
             <h4 className="text-lg font-semibold mb-4">Shipping Address</h4>
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-4">Saved Addresses</h4>
+            <h4 className="text-lg font-semibold mb-4">Saved Addresses</h4>
+            <div className="mt-6 flex gap-2">
+              
               {addresses?.data?.map((address) => (
                 <div
                   key={address._id}
@@ -263,11 +264,14 @@ const Checkout = () => {
                   }`}
                   onClick={() => handleAddressSelect(address)}
                 >
-                  <p>
-                    {address.firstname} {address.lastname},{address.email},{address.mobile}, {address.address1},{address.address2},{" "}
-                    {address.city}, {address.state}, {address.country} -{" "}
-                    {address.pincode}
-                  </p>
+                  <h2 className="text-lg font-[400]"><strong>Name:</strong> {address.firstname} {address.lastname}</h2>
+                  <p className="text-gray-600"><strong>Email:</strong> {address.email}</p>
+                  <p className="text-gray-600"><strong>Mobile no:</strong> {address.mobile}</p>
+                  <p className="text-gray-600"><strong>Address:</strong> {address.address1}, {address.address2}, {address.pincode}</p>
+                  <p className="text-gray-600"><strong>City:</strong> {address.city}</p>
+                  <p className="text-gray-600"><strong>State:</strong> {address.state}</p>
+                  <p className="text-gray-600"><strong>Country:</strong> {address.country}</p>
+                  
                 </div>
               ))}
             </div>
