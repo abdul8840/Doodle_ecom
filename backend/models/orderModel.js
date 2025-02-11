@@ -17,7 +17,11 @@ const orderSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      address: {
+      address1: {
+        type: String,
+        required: true,
+      },
+      address2: {
         type: String,
         required: true,
       },
@@ -29,12 +33,24 @@ const orderSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      other: {
-        type: String,
-      },
+      
       pincode: {
         type: Number,
         required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: [true,"email is Required"],
+        unique: [true,"already in database"],
+      },
+      mobile: {
+        type: String,
+        required: [true,"mobile is Required"],
+        unique: [true,"already in database"],
       },
     },
     paymentInfo: {

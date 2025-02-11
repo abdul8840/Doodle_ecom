@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BiArrowBack } from "react-icons/bi";
+import { BiArrowBack, BiEdit } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -12,11 +12,15 @@ import {
   getUserCart,
   resetState,
 } from "../features/user/userSlice";
+import { getUserAddress } from "../features/address/addressSlice";
 
 let shippingSchema = yup.object({
   firstname: yup.string().required("First Name is Required"),
   lastname: yup.string().required("Last Name is Required"),
-  address: yup.string().required("Address Details are Required"),
+  email: yup.string().required("Email is Required"),
+  mobile: yup.string().required("Mobile number is Required"),
+  address1: yup.string().required("Address1 Details are Required"),
+  address2: yup.string().required("Address2 Details are Required"),
   state: yup.string().required("State is Required"),
   city: yup.string().required("City is Required"),
   country: yup.string().required("Country is Required"),
@@ -27,12 +31,15 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const cartState = useSelector((state) => state?.auth?.cartProducts);
   const authState = useSelector((state) => state?.auth);
+  const { addresses } = useSelector((state) => state.address);
   const [totalAmount, setTotalAmount] = useState(null);
   const [shippingInfo, setShippingInfo] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState({
     razorpayPaymentId: "",
     razorpayOrderId: "",
   });
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // State to handle edit mode
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +65,8 @@ const Checkout = () => {
 
   useEffect(() => {
     dispatch(getUserCart(config2));
-  }, []);
+    dispatch(getUserAddress());
+  }, [dispatch]);
 
   useEffect(() => {
     if (
@@ -75,7 +83,10 @@ const Checkout = () => {
     initialValues: {
       firstname: "",
       lastname: "",
-      address: "",
+      email: "",
+      mobile: "",
+      address1: "",
+      address2: "",
       state: "",
       city: "",
       country: "",
@@ -91,6 +102,33 @@ const Checkout = () => {
       }, 300);
     },
   });
+
+  const handleAddressSelect = (address) => {
+    setSelectedAddress(address);
+    formik.setValues({
+      firstname: address.firstname,
+      lastname: address.lastname,
+      email: address.email,
+      mobile: address.mobile,
+      address1: address.address1,
+      address2: address.address2,
+      state: address.state,
+      city: address.city,
+      country: address.country,
+      pincode: address.pincode,
+      other: address.address2 || "",
+    });
+    setIsEditing(false); // Exit edit mode when a new address is selected
+  };
+
+  const handleEditAddress = () => {
+    setIsEditing(true); // Enter edit mode
+  };
+
+  const handleSaveAddress = () => {
+    setIsEditing(false); // Exit edit mode
+    // You can add logic here to save the edited address to the backend if needed
+  };
 
   const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -215,6 +253,24 @@ const Checkout = () => {
               Abdul Rahman (abdul01@gmail.com)
             </p>
             <h4 className="text-lg font-semibold mb-4">Shipping Address</h4>
+            <div className="mt-6">
+              <h4 className="text-lg font-semibold mb-4">Saved Addresses</h4>
+              {addresses?.data?.map((address) => (
+                <div
+                  key={address._id}
+                  className={`border p-4 mb-2 rounded-lg shadow-md cursor-pointer ${
+                    selectedAddress?._id === address._id ? "border-blue-500" : ""
+                  }`}
+                  onClick={() => handleAddressSelect(address)}
+                >
+                  <p>
+                    {address.firstname} {address.lastname},{address.email},{address.mobile}, {address.address1},{address.address2},{" "}
+                    {address.city}, {address.state}, {address.country} -{" "}
+                    {address.pincode}
+                  </p>
+                </div>
+              ))}
+            </div>
             <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div>
                 <select
@@ -223,6 +279,7 @@ const Checkout = () => {
                   value={formik.values.country}
                   onChange={formik.handleChange("country")}
                   onBlur={formik.handleBlur("country")}
+                  disabled={!isEditing} // Disable field when not in edit mode
                 >
                   <option value="" disabled>
                     Select Country
@@ -245,6 +302,7 @@ const Checkout = () => {
                     value={formik.values.firstname}
                     onChange={formik.handleChange("firstname")}
                     onBlur={formik.handleBlur("firstname")}
+                    disabled={!isEditing} // Disable field when not in edit mode
                   />
                   {formik.touched.firstname && formik.errors.firstname && (
                     <p className="text-red-500 text-sm mt-1">
@@ -261,6 +319,7 @@ const Checkout = () => {
                     value={formik.values.lastname}
                     onChange={formik.handleChange("lastname")}
                     onBlur={formik.handleBlur("lastname")}
+                    disabled={!isEditing} // Disable field when not in edit mode
                   />
                   {formik.touched.lastname && formik.errors.lastname && (
                     <p className="text-red-500 text-sm mt-1">
@@ -269,32 +328,77 @@ const Checkout = () => {
                   )}
                 </div>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange("email")}
+                    onBlur={formik.handleBlur("email")}
+                    disabled={!isEditing} // Disable field when not in edit mode
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {formik.errors.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Mobile Number"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    name="mobile"
+                    value={formik.values.mobile}
+                    onChange={formik.handleChange("mobile")}
+                    onBlur={formik.handleBlur("mobile")}
+                    disabled={!isEditing} // Disable field when not in edit mode
+                  />
+                  {formik.touched.mobile && formik.errors.mobile && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {formik.errors.mobile}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <input
                   type="text"
-                  placeholder="Address"
+                  placeholder="Address1"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  name="address"
-                  value={formik.values.address}
-                  onChange={formik.handleChange("address")}
-                  onBlur={formik.handleBlur("address")}
+                  name="address1"
+                  value={formik.values.address1}
+                  onChange={formik.handleChange("address1")}
+                  onBlur={formik.handleBlur("address1")}
+                  disabled={!isEditing} // Disable field when not in edit mode
                 />
-                {formik.touched.address && formik.errors.address && (
+                {formik.touched.address1 && formik.errors.address1 && (
                   <p className="text-red-500 text-sm mt-1">
-                    {formik.errors.address}
+                    {formik.errors.address1}
                   </p>
                 )}
               </div>
               <div>
                 <input
                   type="text"
-                  placeholder="Apartment, Suite, etc"
+                  placeholder="Address2"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  name="other"
-                  value={formik.values.other}
-                  onChange={formik.handleChange("other")}
-                  onBlur={formik.handleBlur("other")}
+                  name="address2"
+                  value={formik.values.address2}
+                  onChange={formik.handleChange("address2")}
+                  onBlur={formik.handleBlur("address2")}
+                  disabled={!isEditing} // Disable field when not in edit mode
                 />
+                {formik.touched.address2 && formik.errors.address2 && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formik.errors.address2}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -306,6 +410,7 @@ const Checkout = () => {
                     value={formik.values.city}
                     onChange={formik.handleChange("city")}
                     onBlur={formik.handleBlur("city")}
+                    disabled={!isEditing} // Disable field when not in edit mode
                   />
                   {formik.touched.city && formik.errors.city && (
                     <p className="text-red-500 text-sm mt-1">
@@ -320,11 +425,14 @@ const Checkout = () => {
                     value={formik.values.state}
                     onChange={formik.handleChange("state")}
                     onBlur={formik.handleBlur("state")}
+                    disabled={!isEditing} // Disable field when not in edit mode
                   >
                     <option value="" disabled>
                       Select State
                     </option>
                     <option value="Gujarat">Gujarat</option>
+                    <option value="Utther Pradesh">Utther Pradesh</option>
+                    <option value="Maharastra">Maharastra</option>
                   </select>
                   {formik.touched.state && formik.errors.state && (
                     <p className="text-red-500 text-sm mt-1">
@@ -342,6 +450,7 @@ const Checkout = () => {
                   value={formik.values.pincode}
                   onChange={formik.handleChange("pincode")}
                   onBlur={formik.handleBlur("pincode")}
+                  disabled={!isEditing} // Disable field when not in edit mode
                 />
                 {formik.touched.pincode && formik.errors.pincode && (
                   <p className="text-red-500 text-sm mt-1">
@@ -357,6 +466,24 @@ const Checkout = () => {
                   <BiArrowBack className="mr-2" />
                   Return to Cart
                 </Link>
+                {isEditing ? (
+                  <button
+                    type="button"
+                    className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
+                    onClick={handleSaveAddress}
+                  >
+                    Save Address
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                    onClick={handleEditAddress}
+                  >
+                    <BiEdit className="mr-2" />
+                    Edit Address
+                  </button>
+                )}
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
@@ -374,45 +501,46 @@ const Checkout = () => {
               {cartState &&
                 cartState.map((item, index) => (
                   <div key={index} className="flex items-center space-x-4">
-                    <div className="relative">
-                      <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs rounded-full px-2 py-1">
-                        {item.quantity}
-                      </span>
-                      <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs rounded-full px-2 py-1">
-                        {item.size}
-                      </span>
+                    <div className="flex items-center space-x-4">
                       <img
                         src={item.productId.images[0].url}
                         alt={item.productId.title}
                         className="w-16 h-16 object-cover rounded-md"
                       />
-                    </div>
-                    <div>
-                      <h5 className="font-medium">{item.productId.title}</h5>
-                      <p className="text-sm text-gray-600">{item.color.title}</p>
-                    </div>
-                    <div className="ml-auto">
-                      <p className="font-medium">
-                        Rs. {item.selling_price * item.quantity}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {item.productId.title}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {item.color.title} | {item.size}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900 ml-auto">
+                        ₹{item.selling_price * item.quantity}
                       </p>
                     </div>
                   </div>
                 ))}
             </div>
             <div className="border-t border-gray-200 pt-4 mt-4">
-              <div className="flex justify-between mb-2">
-                <p className="text-gray-600">Subtotal</p>
-                <p className="font-medium">Rs. {totalAmount || "0"}</p>
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <p>Subtotal</p>
+                <p>₹{totalAmount}</p>
               </div>
-              <div className="flex justify-between mb-2">
-                <p className="text-gray-600">Shipping</p>
-                <p className="font-medium">Rs. 100</p>
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <p>Shipping</p>
+                <p>₹100</p>
               </div>
-              <div className="flex justify-between mt-4">
-                <h4 className="text-lg font-semibold">Total</h4>
-                <h4 className="text-lg font-semibold">
-                  Rs. {totalAmount ? totalAmount + 100 : "0"}
-                </h4>
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <p>Tax</p>
+                <p>₹0</p>
+              </div>
+              <div className="flex justify-between text-lg font-semibold text-gray-900">
+                <p>Total</p>
+                <p>₹{totalAmount + 100}</p>
               </div>
             </div>
           </div>

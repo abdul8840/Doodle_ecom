@@ -62,8 +62,8 @@ const Orders = () => {
 
                   <Typography variant="h6" className="font-semibold mb-2">Order Items</Typography>
                   {order.orderItems?.map((item, index) => (
-                    <Link to={`/product/${item.product?._id}`}>
-                      <div key={index} className="flex items-center space-x-4 mb-2 border-b pb-2">
+                    <Link to={`/product/${item.product?._id}`} key={index} >
+                      <div className="flex items-center space-x-4 mb-2 border-b pb-2">
                         {/* Product Image */}
                         <img
                           src={item.product.images[0]?.url} // Assuming image is an array, display the first one
