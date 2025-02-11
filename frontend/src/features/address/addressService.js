@@ -21,7 +21,7 @@ const updateAddress = async (data) => {
   try {
     const response = await axios.patch(
       `${base_url}/auth/update-address/${data.id}`,
-      JSON.stringify({  // Ensure data is properly formatted
+      {
         firstname: data.firstname,
         lastname: data.lastname,
         country: data.country,
@@ -34,7 +34,7 @@ const updateAddress = async (data) => {
         mobile: data.mobile,
         status: data.status,
         defaultaddress: data.defaultaddress,
-      }),
+      },
       config
     );
     console.log("Update address response:", response.data);

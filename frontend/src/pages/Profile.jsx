@@ -102,7 +102,7 @@ const Profile = () => {
     validationSchema: addressSchema,
     onSubmit: (values) => {
       if (editAddressId) {
-        dispatch(updateAAddress({ id: editAddressId, data: values, config2 }));
+        dispatch(updateAAddress({ id: editAddressId, ...values }));
         setEditAddressId(null);
       }
     },
