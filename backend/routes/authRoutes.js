@@ -54,10 +54,10 @@ router.get("/getyearlyorders", authMiddleware, getYearlyTotalOrder);
 //Address Routes
 
 router.post('/create-address',authMiddleware,createaddress)
-router.get('/user-address',addressForUser)
+router.get('/user-address/userid',authMiddleware,addressForUser)
 router.get('/get-address',addressList)
 router.get('/get-address/:id',addressSingle)
-router.patch('/address/:id',updateAddress)
+router.patch('/update-address/:id',authMiddleware, updateAddress)
 router.delete('/address/:id',deleteAddress)
 
 export default router;

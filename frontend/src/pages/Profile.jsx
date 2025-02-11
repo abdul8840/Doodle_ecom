@@ -1,20 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../features/user/userSlice";
 import { FiEdit } from "react-icons/fi";
-import { Box, Typography, TextField, Button, Container, Tabs, Tab } from "@mui/material";
-import { Link } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Container,
+  Tabs,
+  Tab,
+} from "@mui/material";
+import { getUserAddress, updateAAddress } from "../features/address/addressSlice";
 
-let profileSchema = yup.object({
+const profileSchema = yup.object({
   firstname: yup.string().required("First Name is Required"),
   lastname: yup.string().required("Last Name is Required"),
   email: yup
     .string()
     .required("Email is Required")
     .email("Email Should be valid"),
-  mobile: yup.number().required().positive().integer("Mobile No is Required"),
+  mobile: yup
+    .string()
+    .matches(/^[0-9]+$/, "Mobile number must be digits")
+    .required("Mobile No is Required"),
+});
+
+const addressSchema = yup.object({
+  firstname: yup.string().required("Required"),
+  lastname: yup.string().required("Required"),
+  country: yup.string().required("Required"),
+  state: yup.string().required("Required"),
+  city: yup.string().required("Required"),
+  pincode: yup.string().required("Required"),
+  address1: yup.string().required("Required"),
+  email: yup.string().email("Invalid email address").required("Required"),
+  mobile: yup
+    .string()
+    .matches(/^[0-9]+$/, "Mobile number must be digits")
+    .required("Required"),
 });
 
 const Profile = () => {
@@ -24,37 +50,91 @@ const Profile = () => {
 
   const config2 = {
     headers: {
-      Authorization: `Bearer ${getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""}`,
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage ? getTokenFromLocalStorage.token : ""
+      }`,
       Accept: "application/json",
     },
   };
 
   const dispatch = useDispatch();
   const userState = useSelector((state) => state.auth.user);
+  const { addresses, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.address
+  );
+
+  const addressList = addresses?.data || [];
+
   const [edit, setEdit] = useState(true);
-  const [tabValue, setTabValue] = useState(0); // State for tab value
+  const [tabValue, setTabValue] = useState(0);
+  const [editAddressId, setEditAddressId] = useState(null);
 
   const formik = useFormik({
     initialValues: {
-      firstname: userState?.firstname,
-      lastname: userState?.lastname,
-      email: userState?.email,
-      mobile: userState?.mobile,
+      firstname: userState?.firstname || "",
+      lastname: userState?.lastname || "",
+      email: userState?.email || "",
+      mobile: userState?.mobile || "",
     },
     validationSchema: profileSchema,
+    enableReinitialize: true,
     onSubmit: (values) => {
-      dispatch(updateProfile({ data: values, config2: config2 }));
+      dispatch(updateProfile({ data: values, config2 }));
       setEdit(true);
     },
   });
 
-  const handleCancel = () => {
+  const addressFormik = useFormik({
+    initialValues: {
+      firstname: "",
+      lastname: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+      address1: "",
+      address2: "",
+      email: "",
+      mobile: "",
+      status: "Active",
+      defaultaddress: false,
+    },
+    validationSchema: addressSchema,
+    onSubmit: (values) => {
+      if (editAddressId) {
+        dispatch(updateAAddress({ id: editAddressId, data: values, config2 }));
+        setEditAddressId(null);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (tabValue === 1) {
+      dispatch(getUserAddress());
+    }
+  }, [tabValue, dispatch]);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const handleEditProfile = () => {
+    setEdit(false);
+  };
+
+  const handleCancelProfileEdit = () => {
     formik.resetForm();
     setEdit(true);
   };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue); // Update tab value
+  const handleEditAddress = (address) => {
+    setEditAddressId(address._id);
+    addressFormik.setValues(address);
+  };
+
+  const handleCancelAddressEdit = () => {
+    addressFormik.resetForm();
+    setEditAddressId(null);
   };
 
   return (
@@ -64,85 +144,44 @@ const Profile = () => {
           My Profile
         </Typography>
 
-        {/* Tabs */}
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="profile tabs">
           <Tab label="My Profile" />
           <Tab label="My Address" />
         </Tabs>
 
-        {/* Tab Content */}
         {tabValue === 0 && (
           <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 3 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", mt: 3 }}>
               <Typography variant="h6">Update Profile</Typography>
-              <FiEdit className="fs-3" onClick={() => setEdit(false)} style={{ cursor: 'pointer' }} />
+              <FiEdit onClick={handleEditProfile} style={{ cursor: "pointer" }} />
             </Box>
 
-            <form onSubmit={formik.handleSubmit} style={{ width: '100%' }}>
+            <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
               <Box sx={{ my: 2 }}>
-                <TextField
-                  label="First Name"
-                  variant="outlined"
-                  fullWidth
-                  name="firstname"
-                  disabled={edit}
-                  value={formik.values.firstname}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.firstname && Boolean(formik.errors.firstname)}
-                  helperText={formik.touched.firstname && formik.errors.firstname}
-                  sx={{ mb: 2 }}
-                />
-
-                <TextField
-                  label="Last Name"
-                  variant="outlined"
-                  fullWidth
-                  name="lastname"
-                  disabled={edit}
-                  value={formik.values.lastname}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.lastname && Boolean(formik.errors.lastname)}
-                  helperText={formik.touched.lastname && formik.errors.lastname}
-                  sx={{ mb: 2 }}
-                />
-
-                <TextField
-                  label="Email"
-                  variant="outlined"
-                  fullWidth
-                  name="email"
-                  disabled={edit}
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
-                  sx={{ mb: 2 }}
-                />
-
-                <TextField
-                  label="Mobile No"
-                  variant="outlined"
-                  fullWidth
-                  name="mobile"
-                  disabled={edit}
-                  value={formik.values.mobile}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.mobile && Boolean(formik.errors.mobile)}
-                  helperText={formik.touched.mobile && formik.errors.mobile}
-                  sx={{ mb: 2 }}
-                />
+                {["firstname", "lastname", "email", "mobile"].map((field) => (
+                  <TextField
+                    key={field}
+                    label={field.charAt(0).toUpperCase() + field.slice(1)}
+                    variant="outlined"
+                    fullWidth
+                    name={field}
+                    disabled={edit}
+                    value={formik.values[field]}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched[field] && Boolean(formik.errors[field])}
+                    helperText={formik.touched[field] && formik.errors[field]}
+                    sx={{ mb: 2 }}
+                  />
+                ))}
               </Box>
 
               {!edit && (
-                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
                   <Button type="submit" variant="contained" color="primary">
                     Save
                   </Button>
-                  <Button type="button" variant="outlined" color="secondary" onClick={handleCancel}>
+                  <Button type="button" variant="outlined" color="secondary" onClick={handleCancelProfileEdit}>
                     Cancel
                   </Button>
                 </Box>
@@ -152,11 +191,47 @@ const Profile = () => {
         )}
 
         {tabValue === 1 && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6">My Address</Typography>
-            {/* Display Addresses Here */}
-            <Typography variant="body1">No addresses found.</Typography>
-          </Box>
+          <div className="p-4">
+            <h2 className="text-2xl font-bold mb-4">Saved Addresses</h2>
+            {isLoading && <p>Loading addresses...</p>}
+            {isError && <p className="text-red-500">{message || "Failed to load addresses."}</p>}
+            {isSuccess && addressList.length > 0 ? (
+              addressList.map((item) => (
+                <div key={item._id} className="border p-4 mb-2 rounded-lg shadow-md">
+                  {editAddressId === item._id ? (
+                    <form onSubmit={addressFormik.handleSubmit}>
+                      {["firstname", "lastname", "country", "state", "city", "pincode", "address1", "email", "mobile"].map((field) => (
+                        <TextField
+                          key={field}
+                          label={field.charAt(0).toUpperCase() + field.slice(1)}
+                          fullWidth
+                          name={field}
+                          value={addressFormik.values[field]}
+                          onChange={addressFormik.handleChange}
+                          sx={{ mb: 2 }}
+                        />
+                      ))}
+                      <Box sx={{ display: "flex", gap: 2 }}>
+                        <Button type="submit" variant="contained" color="primary">
+                          Save
+                        </Button>
+                        <Button variant="outlined" color="secondary" onClick={handleCancelAddressEdit}>
+                          Cancel
+                        </Button>
+                      </Box>
+                    </form>
+                  ) : (
+                    <div>
+                      <p>{item.firstname} {item.lastname}, {item.address1}, {item.city}, {item.state}, {item.country} - {item.pincode}</p>
+                      <FiEdit onClick={() => handleEditAddress(item)} style={{ cursor: "pointer" }} />
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No addresses found.</p>
+            )}
+          </div>
         )}
       </Box>
     </Container>

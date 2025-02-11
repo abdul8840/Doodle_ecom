@@ -116,9 +116,13 @@ export const deleteAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
   const addressId = req.params.id;
+  console.log("Received Update Data:", req.body); // Debugging step
+  console.log("Updating Address ID:", addressId); // Debugging step
+
   try {
     const updatedaddress = await Address.findByIdAndUpdate(addressId, req.body, {
-      new: true,
+      new: true, // Ensures it returns the updated document
+      runValidators: true, // Ensures validation rules are applied
     });
 
     if (!updatedaddress) {
@@ -127,6 +131,7 @@ export const updateAddress = async (req, res) => {
         .json({ status: "failed", message: "Address not found" });
     }
 
+    console.log("Updated Address:", updatedaddress); // Debugging step
     res.json({ status: "successfully update", data: updatedaddress });
   } catch (err) {
     console.error(`Error: ${err}`);

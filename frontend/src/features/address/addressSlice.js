@@ -13,6 +13,28 @@ export const createAddress = createAsyncThunk(
   }
 );
 
+export const getUserAddress = createAsyncThunk(
+  "user/address/get",
+  async (_, thunkAPI) => {
+    try {
+      return await addressService.getUserAddress();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const updateAAddress = createAsyncThunk(
+  "user/address/update",
+  async (data, thunkAPI) => {
+    try {
+      return await addressService.updateAddress(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const resetState = createAction("Reset_all");
 
 const getCustomerfromLocalStorage = localStorage.getItem("customer")
@@ -47,6 +69,40 @@ export const addressSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = false;
         state.message = action.error;
+      })
+      .addCase(getUserAddress.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserAddress.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.addresses = action.payload;
+      })
+      .addCase(getUserAddress.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(updateAAddress.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateAAddress.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.updateAddress = action.payload;
+        
+      })
+      .addCase(updateAAddress.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+        if (state.isError) {
+          toast.error("Something Went Wrong!");
+        }
       })
       .addCase(resetState, () => addressState);
   },
