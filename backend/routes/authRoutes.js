@@ -53,7 +53,7 @@ router.get("/getyearlyorders", authMiddleware, getYearlyTotalOrder);
 
 //Address Routes
 
-router.post('/create-address',createaddress)
+router.post('/create-address',authMiddleware,createaddress)
 router.get('/user-address',addressForUser)
 router.get('/get-address',addressList)
 router.get('/get-address/:id',addressSingle)
