@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts, addToWishlist } from "../features/products/productSlice";
@@ -16,21 +16,29 @@ const Home = () => {
   const dispatch = useDispatch();
 
   // Local state to store wishlist for real-time UI updates
-  const [wishlist, setWishlist] = useState([]);
+  const [wishlist, setWishlist] = useState(wishlistFromRedux);
 
+  // Fetch products and wishlist on component mount
   useEffect(() => {
     dispatch(getAllProducts());
     dispatch(getuserProductWishlist());
-  }, [dispatch]);
-
+  }, []); // ✅ Fetch only on mount
+  
   useEffect(() => {
-    setWishlist(wishlistFromRedux); // Sync Redux state with local state
-  }, [wishlistFromRedux]);
+    setWishlist((prevWishlist) => {
+      if (JSON.stringify(prevWishlist) !== JSON.stringify(wishlistFromRedux)) {
+        return wishlistFromRedux;
+      }
+      return prevWishlist;
+    });
+  }, [wishlistFromRedux]); // ✅ Update state only when needed
+  
 
   const toggleWishlist = async (id) => {
     const isInWishlist = wishlist.some((wishItem) => wishItem._id === id);
 
-    await dispatch(addToWishlist(id)); 
+    // Dispatch the addToWishlist action
+    await dispatch(addToWishlist(id));
 
     // Update local state immediately for real-time UI update
     setWishlist((prevWishlist) => {
@@ -41,6 +49,7 @@ const Home = () => {
       }
     });
 
+    // Show toast notification
     toast[isInWishlist ? "info" : "success"](
       `Product successfully ${isInWishlist ? "removed from" : "added to"} wishlist`
     );

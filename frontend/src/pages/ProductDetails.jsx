@@ -93,21 +93,37 @@ const ProductDetails = () => {
     setZoomStyle({ display: "none" });
   };
 
-  const isInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
+  useEffect(() => {
+    setWishlist(wishlistFromRedux);
+  }, [wishlistFromRedux]);
+
+  const isInWishlist = wishlist.some((wishItem) => wishItem._id === productState?._id);
 
   const toggleWishlist = () => {
     if (!productState?._id) return;
 
-    const alreadyInWishlist = wishlist.some((wishItem) => wishItem._id === productState._id);
-
     dispatch(addToWishlist(productState._id));
-
-    if (alreadyInWishlist) {
-      toast.info("Product successfully removed from wishlist");
-    } else {
-      toast.success("Product successfully added to wishlist");
-    }
+    
+    // **Optimistic UI Update**
+    setWishlist((prevWishlist) => {
+      const alreadyInWishlist = prevWishlist.some((wishItem) => wishItem._id === productState._id);
+      if (alreadyInWishlist) {
+        toast.info("Product removed from wishlist");
+        return prevWishlist.filter((wishItem) => wishItem._id !== productState._id);
+      } else {
+        toast.success("Product added to wishlist");
+        return [...prevWishlist, productState]; // Add product locally
+      }
+    });
   };
+
+  const calculateTotalRating = (ratings) => {
+    if (!ratings || ratings.length === 0) return 0;
+    const total = ratings.reduce((sum, rating) => sum + rating.star, 0);
+    return (total / ratings.length).toFixed(1);
+  };
+
+  const totalRating = calculateTotalRating(productState?.ratings);
 
   const addRatingToProduct = () => {
     if (star === 0) {
@@ -117,14 +133,13 @@ const ProductDetails = () => {
       toast.error("Please Write Review About the Product");
       return false;
     } else {
-      dispatch(
-        addRating({ star: star, comment: comment, prodId: getProductId })
-      );
-      setTimeout(() => {
-        dispatch(getAProduct(getProductId));
-      }, 100);
+      dispatch(addRating({ star: star, comment: comment, prodId: getProductId }))
+        .then(() => {
+          dispatch(getAProduct(getProductId)); // Fetch the product again to update the state
+          setStar(0); // Reset star rating
+          setComment(""); // Reset comment
+        });
     }
-    return false;
   };
 
   return (
@@ -179,11 +194,11 @@ const ProductDetails = () => {
               <div className="border-b-2 py-3">
                 <div className="flex items-center gap-10">
                   <div className="flex gap-2 items-center justify-center">
-                    <p className="">({productState?.totalrating}/5)</p>
+                    <p className="">({totalRating}/5)</p>
                     <ReactStars
                       count={5}
                       size={24}
-                      value={parseFloat(productState?.totalrating)} // Convert to number
+                      value={productState?.totalrating.toString()} // Convert to number
                       edit={false}
                       activeColor="#ffd700"
                     />
@@ -309,7 +324,7 @@ const ProductDetails = () => {
                     <ReactStars
                       count={5}
                       size={24}
-                      value={parseFloat(productState?.totalrating)} // Convert to number
+                      value={parseFloat(totalRating)} // Convert to number
                       edit={false}
                       activeColor="#ffd700"
                     />
@@ -362,41 +377,29 @@ const ProductDetails = () => {
                 </div>
               </div>
               <div className="reviews mt-4">
-  {productState &&
-    productState.ratings?.map((item, index) => {
-      
-      return (
-        <div className="review mb-4 p-3 bg-gray-100 rounded-lg" key={index}>
-          <div className="d-flex gap-10 align-items-center">
-            <div className="flex items-center gap-2">
-              {/* Display the reviewer's avatar (optional) */}
-              {/* <Avatar className="!w-7 !h-7 hover:shadow-lg transition-shadow">
-                {item.postedby.firstname.charAt(0)}
-              </Avatar> */}
-
-              {/* Display the reviewer's name */}
-              <h6 className="mb-0">
-                {item.postedby.firstname} {item.postedby.lastname}
-              </h6>
-            </div>
-
-            {/* Display the star rating */}
-            <ReactStars
-              count={5}
-              size={24}
-              value={item?.star}
-              edit={false}
-              activeColor="#ffd700"
-            />
-          </div>
-
-          {/* Display the review comment */}
-          <p className="mt-3">{item?.comment}</p>
-        </div>
-      );
-    })}
-</div>
-
+                {productState &&
+                  productState.ratings?.map((item, index) => {
+                    return (
+                      <div className="review mb-4 p-3 bg-gray-100 rounded-lg" key={index}>
+                        <div className="d-flex gap-10 align-items-center">
+                          <div className="flex items-center gap-2">
+                            <h6 className="mb-0">
+                              {item?.postedby?.firstname || "Anonymous"} {item?.postedby?.lastname || ""}
+                            </h6>
+                          </div>
+                          <ReactStars
+                            count={5}
+                            size={24}
+                            value={item?.star}
+                            edit={false}
+                            activeColor="#ffd700"
+                          />
+                        </div>
+                        <p className="mt-3">{item?.comment}</p>
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
           </div>
         </Box>
