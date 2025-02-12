@@ -1,5 +1,5 @@
 import express from 'express'
-import { addToWishlist, createProduct, deleteProduct, getAllProduct, getaProduct, updateProduct } from '../controllers/productController.js'
+import { addToWishlist, createProduct, deleteProduct, getAllProduct, getaProduct, rating, updateProduct } from '../controllers/productController.js'
 import { authMiddleware, isAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router()
@@ -11,5 +11,7 @@ router.delete("/delete-product/:id", authMiddleware, isAdmin, deleteProduct);
 router.get("/getall-product", getAllProduct);
 
 router.put("/wishlist", authMiddleware, addToWishlist);
+
+router.put("/rating", authMiddleware, rating);
 
 export default router;
