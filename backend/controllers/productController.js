@@ -153,57 +153,62 @@ export const addToWishlist = async (req, res) => {
 };
 
 export const rating = async (req, res) => {
-  const { _id } = req.user;
+  const { _id } = req.user; // User ID from authentication
   const { star, prodId, comment } = req.body;
+
   try {
-    const product = await Product.findById(prodId);
-    let alreadyRated = product.ratings.find(
-      (userId) => userId.postedby.toString() === _id.toString()
-    );
+    // Fetch product and populate ratings
+    const product = await Product.findById(prodId).populate("ratings.postedby", "firstname lastname email");
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if user has already rated the product
+    let alreadyRated = product.ratings.find((rating) => rating.postedby._id.toString() === _id.toString());
+
     if (alreadyRated) {
-      const updateRating = await Product.updateOne(
+      // Update existing rating
+      await Product.findOneAndUpdate(
         {
-          ratings: { $elemMatch: alreadyRated },
+          _id: prodId,
+          "ratings.postedby": _id,
         },
         {
           $set: { "ratings.$.star": star, "ratings.$.comment": comment },
         },
-        {
-          new: true,
-        }
+        { new: true }
       );
     } else {
-      const rateProduct = await Product.findByIdAndUpdate(
+      // Add new rating
+      await Product.findByIdAndUpdate(
         prodId,
         {
           $push: {
             ratings: {
-              star: star,
-              comment: comment,
+              star,
+              comment,
               postedby: _id,
             },
           },
         },
-        {
-          new: true,
-        }
+        { new: true }
       );
     }
-    const getallratings = await Product.findById(prodId);
-    let totalRating = getallratings.ratings.length;
-    let ratingsum = getallratings.ratings
-      .map((item) => item.star)
-      .reduce((prev, curr) => prev + curr, 0);
-    let actualRating = Math.round(ratingsum / totalRating);
-    let finalproduct = await Product.findByIdAndUpdate(
-      prodId,
-      {
-        totalrating: actualRating,
-      },
-      { new: true }
-    );
-    res.json(finalproduct);
+
+    // Recalculate total rating
+    const updatedProduct = await Product.findById(prodId).populate("ratings.postedby", "firstname lastname email");
+    
+    let totalRatings = updatedProduct.ratings.length;
+    let ratingSum = updatedProduct.ratings.reduce((sum, rating) => sum + rating.star, 0);
+    let averageRating = totalRatings > 0 ? Math.round(ratingSum / totalRatings) : 0;
+
+    updatedProduct.totalrating = averageRating;
+    await updatedProduct.save();
+
+    res.json(updatedProduct);
   } catch (error) {
-    throw new Error(error);
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };

@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getAProduct, getAllProducts, addToWishlist } from "../features/products/productSlice";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getAProduct, getAllProducts, addRating, addToWishlist } from "../features/products/productSlice";
 import { getuserProductWishlist } from "../features/user/userSlice";
-import { Container, Grid, Typography, Box, Button, IconButton, Alert } from "@mui/material";
+import { Container, Grid, Typography, Box, Button, IconButton, Alert, TextField, Avatar } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { addProdToCart, getUserCart } from "../features/user/userSlice";
+import ReactStars from "react-rating-stars-component";
 
 const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [zoomStyle, setZoomStyle] = useState({ display: "none" });
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [showDescription, setShowDescription] = useState(false); // Toggle state for description
+  const [showDescription, setShowDescription] = useState(false);
   const [alreadyAdded, setAlreadyAdded] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [orderedProduct, setorderedProduct] = useState(true);
+  const [star, setStar] = useState(0);
+  const [comment, setComment] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,7 +30,6 @@ const ProductDetails = () => {
   const productState = useSelector((state) => state?.product?.singleproduct);
   const wishlistFromRedux = useSelector((state) => state?.auth?.wishlist?.wishlist) || [];
   const [wishlist, setWishlist] = useState([]);
-  //cart
   const cartState = useSelector((state) => state?.auth?.cartProducts);
 
   useEffect(() => {
@@ -42,14 +45,13 @@ const ProductDetails = () => {
     }
   }, [productState]);
 
-  //handle cart
   useEffect(() => {
     for (let index = 0; index < cartState?.length; index++) {
       if (getProductId === cartState[index]?.productId?._id) {
         setAlreadyAdded(true);
       }
     }
-  });
+  }, [cartState, getProductId]);
 
   const uploadCart = () => {
     if (selectedColor === null) {
@@ -72,7 +74,6 @@ const ProductDetails = () => {
     }
   };
 
-  // Handle mouse movement for zoom effect
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.target.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
@@ -106,6 +107,24 @@ const ProductDetails = () => {
     } else {
       toast.success("Product successfully added to wishlist");
     }
+  };
+
+  const addRatingToProduct = () => {
+    if (star === 0) {
+      toast.error("Please add star rating");
+      return false;
+    } else if (comment === "") {
+      toast.error("Please Write Review About the Product");
+      return false;
+    } else {
+      dispatch(
+        addRating({ star: star, comment: comment, prodId: getProductId })
+      );
+      setTimeout(() => {
+        dispatch(getAProduct(getProductId));
+      }, 100);
+    }
+    return false;
   };
 
   return (
@@ -157,6 +176,23 @@ const ProductDetails = () => {
                   {Math.round(((productState?.mrp_price - productState?.selling_price) / productState?.mrp_price) * 100)}% Off
                 </h2>
               </div>
+              <div className="border-b-2 py-3">
+                <div className="flex items-center gap-10">
+                  <div className="flex gap-2 items-center justify-center">
+                    <p className="">({productState?.totalrating}/5)</p>
+                    <ReactStars
+                      count={5}
+                      size={24}
+                      value={parseFloat(productState?.totalrating)} // Convert to number
+                      edit={false}
+                      activeColor="#ffd700"
+                    />
+                  </div>
+                  <p className="mb-0 text-[12px]">
+                    ( {productState?.ratings?.length} Reviews )
+                  </p>
+                </div>
+              </div>
             </Typography>
             <div className="flex flex-col gap-2 mt-10">
               <Typography variant="body1">
@@ -164,9 +200,6 @@ const ProductDetails = () => {
               </Typography>
               <Typography variant="body1">
                 <strong>Brand:</strong> {productState?.brand}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Category:</strong> {productState?.category}
               </Typography>
               <Typography variant="body1">
                 <strong>Tags:</strong> {productState?.tags}
@@ -177,7 +210,6 @@ const ProductDetails = () => {
             </div>
 
             <Box className="flex items-center mt-4">
-              {/* Wishlist Button */}
               <strong>Add To Wishlist:</strong>
               <IconButton onClick={toggleWishlist} color="primary">
                 {isInWishlist ? (
@@ -188,7 +220,6 @@ const ProductDetails = () => {
               </IconButton>
             </Box>
 
-            {/* Size Selection */}
             <Box className="mt-4">
               <Typography variant="body1"><strong>Select Size:</strong></Typography>
               <Box className="flex gap-2 mt-2">
@@ -205,7 +236,6 @@ const ProductDetails = () => {
               </Box>
             </Box>
 
-            {/* Color Selection */}
             <Box className="mt-4">
               <Typography variant="body1"><strong>Select Color:</strong></Typography>
               <Box className="flex gap-2 mt-2">
@@ -223,7 +253,6 @@ const ProductDetails = () => {
               </Box>
             </Box>
 
-            {/* Add to Cart Button */}
             <Button
               variant="contained"
               color="primary"
@@ -235,13 +264,12 @@ const ProductDetails = () => {
               {alreadyAdded ? "Go to Cart" : "Add to Cart"}
             </Button>
 
-            {showAlert && ( 
+            {showAlert && (
               <Alert severity="error" className="mt-2">
                 Please select color and size
               </Alert>
             )}
 
-            {/* Product Description Toggle */}
             <Box className="mt-6">
               <Typography
                 className="cursor-pointer text-lg font-bold text-blue-600"
@@ -267,6 +295,112 @@ const ProductDetails = () => {
           </Box>
         </Grid>
       </Grid>
+
+      {/* Reviews Section */}
+      <Container className="reviews-wrapper home-wrapper-2 mt-10">
+        <Box className="row">
+          <div id="review" className="col-12">
+            <h3 id="review">Reviews</h3>
+            <div className="review-inner-wrapper bg-white p-4 rounded-lg shadow-md">
+              <div className="flex justify-between align-items-end border-b-2 pb-4">
+                <div>
+                  <h4 className="font-semibold text-xl mb-2">Customer Reviews</h4>
+                  <div className="flex items-center gap-10">
+                    <ReactStars
+                      count={5}
+                      size={24}
+                      value={parseFloat(productState?.totalrating)} // Convert to number
+                      edit={false}
+                      activeColor="#ffd700"
+                    />
+                    <p className="mb-0">
+                      Based on {productState?.ratings?.length} Reviews
+                    </p>
+                  </div>
+                </div>
+                {orderedProduct && (
+                  <div>
+                    <a className="text-dark text-decoration-underline" href="">
+                      Write a Review
+                    </a>
+                  </div>
+                )}
+              </div>
+              <div className="review-form py-4">
+                <h4 className="font-semibold text-xl">Write a Review</h4>
+
+                <div>
+                  <ReactStars
+                    count={5}
+                    size={24}
+                    value={star}
+                    edit={true}
+                    activeColor="#ffd700"
+                    onChange={(newRating) => setStar(newRating)}
+                    classNames="mb-3"
+                  />
+                </div>
+                <div>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                    placeholder="Comments"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
+                </div>
+                <div className="d-flex justify-content-end mt-3">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={addRatingToProduct}
+                  >
+                    Submit Review
+                  </Button>
+                </div>
+              </div>
+              <div className="reviews mt-4">
+  {productState &&
+    productState.ratings?.map((item, index) => {
+      
+      return (
+        <div className="review mb-4 p-3 bg-gray-100 rounded-lg" key={index}>
+          <div className="d-flex gap-10 align-items-center">
+            <div className="flex items-center gap-2">
+              {/* Display the reviewer's avatar (optional) */}
+              {/* <Avatar className="!w-7 !h-7 hover:shadow-lg transition-shadow">
+                {item.postedby.firstname.charAt(0)}
+              </Avatar> */}
+
+              {/* Display the reviewer's name */}
+              <h6 className="mb-0">
+                {item.postedby.firstname} {item.postedby.lastname}
+              </h6>
+            </div>
+
+            {/* Display the star rating */}
+            <ReactStars
+              count={5}
+              size={24}
+              value={item?.star}
+              edit={false}
+              activeColor="#ffd700"
+            />
+          </div>
+
+          {/* Display the review comment */}
+          <p className="mt-3">{item?.comment}</p>
+        </div>
+      );
+    })}
+</div>
+
+            </div>
+          </div>
+        </Box>
+      </Container>
     </Container>
   );
 };

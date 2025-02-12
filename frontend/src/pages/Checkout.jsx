@@ -39,15 +39,18 @@ const Checkout = () => {
     razorpayOrderId: "",
   });
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // State to handle edit mode
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false); // Track payment success
   const navigate = useNavigate();
 
+  // Redirect to cart only if the cart is empty and payment was not successful
   useEffect(() => {
-    if (!cartState || cartState.length === 0) {
+    if ((!cartState || cartState.length === 0) && !isPaymentSuccess) {
       navigate("/cart");
     }
-  }, [cartState, navigate]);
+  }, [cartState, navigate, isPaymentSuccess]);
 
+  // Calculate total amount
   useEffect(() => {
     let sum = 0;
     for (let index = 0; index < cartState?.length; index++) {
@@ -62,8 +65,9 @@ const Checkout = () => {
 
   const config2 = {
     headers: {
-      Authorization: `Bearer ${getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
-        }`,
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+      }`,
       Accept: "application/json",
     },
   };
@@ -123,16 +127,15 @@ const Checkout = () => {
       pincode: address.pincode,
       other: address.address2 || "",
     });
-    setIsEditing(false); // Exit edit mode when a new address is selected
+    setIsEditing(false);
   };
 
   const handleEditAddress = () => {
-    setIsEditing(true); // Enter edit mode
+    setIsEditing(true);
   };
 
   const handleSaveAddress = () => {
-    setIsEditing(false); // Exit edit mode
-    // You can add logic here to save the edited address to the backend if needed
+    setIsEditing(false);
   };
 
   const loadScript = (src) => {
@@ -167,25 +170,25 @@ const Checkout = () => {
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
-  
+
     if (!res) {
       alert("Razorpay SDK failed to Load");
       return;
     }
-  
+
     const result = await axios.post(
       "http://localhost:8000/api/auth/order/checkout",
       { amount: totalAmount + 100 },
       config
     );
-  
+
     if (!result) {
       alert("Something Went Wrong");
       return;
     }
-  
+
     const { amount, id: order_id, currency } = result.data.order;
-  
+
     const options = {
       key: "rzp_test_HSSeDI22muUrLR", // Enter the Key ID generated from the Dashboard
       amount: amount,
@@ -199,13 +202,13 @@ const Checkout = () => {
           razorpayPaymentId: response.razorpay_payment_id,
           razorpayOrderId: response.razorpay_order_id,
         };
-  
+
         const result = await axios.post(
           "http://localhost:8000/api/auth/order/paymentVerification",
           data,
           config
         );
-  
+
         dispatch(
           createAnOrder({
             totalPrice: totalAmount,
@@ -215,11 +218,14 @@ const Checkout = () => {
             shippingInfo: JSON.parse(localStorage.getItem("address")),
           })
         );
-  
+
         dispatch(deleteUserCart(config2));
         localStorage.removeItem("address");
         dispatch(resetState());
-  
+
+        // Set payment success to true
+        setIsPaymentSuccess(true);
+
         // Redirect to the My Orders page after successful payment
         navigate("/my-orders");
       },
@@ -235,7 +241,7 @@ const Checkout = () => {
         color: "#61dafb",
       },
     };
-  
+
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
