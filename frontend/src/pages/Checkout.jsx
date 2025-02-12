@@ -43,6 +43,12 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!cartState || cartState.length === 0) {
+      navigate("/cart");
+    }
+  }, [cartState, navigate]);
+
+  useEffect(() => {
     let sum = 0;
     for (let index = 0; index < cartState?.length; index++) {
       sum = sum + Number(cartState[index].quantity) * cartState[index].selling_price;
@@ -56,9 +62,8 @@ const Checkout = () => {
 
   const config2 = {
     headers: {
-      Authorization: `Bearer ${
-        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
-      }`,
+      Authorization: `Bearer ${getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+        }`,
       Accept: "application/json",
     },
   };
@@ -162,24 +167,25 @@ const Checkout = () => {
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
-
+  
     if (!res) {
       alert("Razorpay SDK failed to Load");
       return;
     }
+  
     const result = await axios.post(
       "http://localhost:8000/api/auth/order/checkout",
       { amount: totalAmount + 100 },
       config
     );
-
+  
     if (!result) {
       alert("Something Went Wrong");
       return;
     }
-
+  
     const { amount, id: order_id, currency } = result.data.order;
-
+  
     const options = {
       key: "rzp_test_HSSeDI22muUrLR", // Enter the Key ID generated from the Dashboard
       amount: amount,
@@ -193,13 +199,13 @@ const Checkout = () => {
           razorpayPaymentId: response.razorpay_payment_id,
           razorpayOrderId: response.razorpay_order_id,
         };
-
+  
         const result = await axios.post(
           "http://localhost:8000/api/auth/order/paymentVerification",
           data,
           config
         );
-
+  
         dispatch(
           createAnOrder({
             totalPrice: totalAmount,
@@ -209,9 +215,13 @@ const Checkout = () => {
             shippingInfo: JSON.parse(localStorage.getItem("address")),
           })
         );
+  
         dispatch(deleteUserCart(config2));
         localStorage.removeItem("address");
         dispatch(resetState());
+  
+        // Redirect to the My Orders page after successful payment
+        navigate("/my-orders");
       },
       prefill: {
         name: "Abdul Rahman",
@@ -225,7 +235,7 @@ const Checkout = () => {
         color: "#61dafb",
       },
     };
-
+  
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
@@ -235,7 +245,7 @@ const Checkout = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Shipping Information */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md order-2">
             <h3 className="text-2xl font-bold mb-4">Cart Corner</h3>
             <nav className="flex space-x-2 mb-6">
               <Link to="/cart" className="text-gray-600 hover:text-gray-900">
@@ -254,14 +264,13 @@ const Checkout = () => {
             </p>
             <h4 className="text-lg font-semibold mb-4">Shipping Address</h4>
             <h4 className="text-lg font-semibold mb-4">Saved Addresses</h4>
-            <div className="mt-6 flex gap-2">
-              
+            <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-2">
+
               {addresses?.data?.map((address) => (
                 <div
                   key={address._id}
-                  className={`border p-4 mb-2 rounded-lg shadow-md cursor-pointer ${
-                    selectedAddress?._id === address._id ? "border-blue-500" : ""
-                  }`}
+                  className={`border p-4 mb-2 rounded-lg shadow-md cursor-pointer ${selectedAddress?._id === address._id ? "border-blue-500" : ""
+                    }`}
                   onClick={() => handleAddressSelect(address)}
                 >
                   <h2 className="text-lg font-[400]"><strong>Name:</strong> {address.firstname} {address.lastname}</h2>
@@ -271,7 +280,7 @@ const Checkout = () => {
                   <p className="text-gray-600"><strong>City:</strong> {address.city}</p>
                   <p className="text-gray-600"><strong>State:</strong> {address.state}</p>
                   <p className="text-gray-600"><strong>Country:</strong> {address.country}</p>
-                  
+
                 </div>
               ))}
             </div>
@@ -462,10 +471,10 @@ const Checkout = () => {
                   </p>
                 )}
               </div>
-              <div className="flex justify-between items-center mt-6">
+              <div className="flex flex-col md:flex-row gap-4 justify-between items-center mt-6">
                 <Link
                   to="/cart"
-                  className="flex items-center text-gray-600 hover:text-gray-900"
+                  className="flex items-center text-gray-600 hover:text-gray-900 w-full"
                 >
                   <BiArrowBack className="mr-2" />
                   Return to Cart
@@ -473,7 +482,7 @@ const Checkout = () => {
                 {isEditing ? (
                   <button
                     type="button"
-                    className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
+                    className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 w-full"
                     onClick={handleSaveAddress}
                   >
                     Save Address
@@ -481,7 +490,7 @@ const Checkout = () => {
                 ) : (
                   <button
                     type="button"
-                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 flex items-center w-full justify-center"
                     onClick={handleEditAddress}
                   >
                     <BiEdit className="mr-2" />
@@ -490,10 +499,11 @@ const Checkout = () => {
                 )}
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 w-full"
                 >
                   Place Order
                 </button>
+
               </div>
             </form>
           </div>
@@ -515,9 +525,14 @@ const Checkout = () => {
                         <p className="text-sm font-medium text-gray-900">
                           {item.productId.title}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {item.color.title} | {item.size}
+                        <p className="text-sm text-gray-500 flex gap-1 items-center">
+                          <span
+                            className="h-4 w-4 rounded-full inline-block ml-1 mt-1"
+                            style={{ backgroundColor: item.color.title }}
+                          ></span>
+                          | {item.size}
                         </p>
+
                         <p className="text-sm text-gray-500">
                           Qty: {item.quantity}
                         </p>
@@ -545,6 +560,9 @@ const Checkout = () => {
               <div className="flex justify-between text-lg font-semibold text-gray-900">
                 <p>Total</p>
                 <p>₹{totalAmount + 100}</p>
+              </div>
+              <div className="w-full flex justify-end">
+                
               </div>
             </div>
           </div>

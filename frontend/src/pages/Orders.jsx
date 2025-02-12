@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const Orders = () => {
   const dispatch = useDispatch();
-  const orderState = useSelector((state) => state?.auth?.getorderedProduct?.orders);
+  const orderState = useSelector((state) => state?.auth?.getorderedProduct?.orders) || [];
 
   const getTokenFromLocalStorage = localStorage.getItem("customer")
     ? JSON.parse(localStorage.getItem("customer"))
@@ -42,7 +42,7 @@ const Orders = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-2 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
       <div className="space-y-6">
-        {orderState?.map((order) => {
+      {[...orderState]?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))?.map((order) => {
           // Get current order status index
           const currentStatusIndex = orderSteps.findIndex(step => step.status === order.orderStatus);
 
@@ -54,7 +54,7 @@ const Orders = () => {
                 <Typography variant="body2" className="text-gray-500">Discounted Price: ₹{order.totalPriceAfterDiscount}</Typography>
                 <Typography variant="body2" className="text-gray-500">User Name: {order.user?.firstname} {order.user?.lastname}</Typography>
                 <Typography variant="body2" className="text-gray-500">
-                  Shipping Address: {order.shippingInfo?.other}, {order.shippingInfo?.address}, {order.shippingInfo?.city}, {order.shippingInfo?.state}, {order.shippingInfo?.pincode}
+                  Shipping Address: {order.shippingInfo?.address1}, {order.shippingInfo?.address2}, {order.shippingInfo?.city}, {order.shippingInfo?.state}, {order.shippingInfo?.pincode}
                 </Typography>
 
                 {/* Order Items */}
